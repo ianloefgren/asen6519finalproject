@@ -32,7 +32,7 @@ nj = size(X1,2);
 N = length(x);
 [c] = whoRmyNeighbours(ni,nj);
 
-Tloc=[35 50]; % True initial location
+Tloc=[5 50]; % True initial location
 
 
 Pkp1k = zeros(N,N);
@@ -50,8 +50,8 @@ end
 % position is defined by the cell center
 a = 0.9;
 for ii=1:N
-    jN = floor((ii-1)/nj)+1;
-    iN = ii-(jN-1)*ni;
+    iN = floor((ii-1)/nj)+1;
+    jN = ii-(iN-1)*ni;
     
     xi = xspace(iN);
     yi = xspace(jN);
@@ -67,7 +67,7 @@ if plotFlag
     b1=figure();
     b1.Position = [343 178 1142 813];
     % 
-    pyx1 = reshape( pyxCell(:,25) , size(X1));
+    pyx1 = reshape( pyxCell(:,100) , size(X1));
     % surf(X1,X2,pyx1,'EdgeColor','none'), 
     surf(X1,X2,pyx1,'EdgeColor','none'), 
     surf(X1,X2,pyx1,'EdgeColor','none','facecolor','interp'), 
