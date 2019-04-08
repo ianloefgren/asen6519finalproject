@@ -5,17 +5,17 @@
 clear all; clc; close all;
 lw = 2;
 fs = 16;
-plotFlag = 1;
+plotFlag = 0;
 
 s = RandStream('mlfg6331_64');
 
-DynamicModel = 1;   % 1 - random walk, 2 - still target
+DynamicModel = 2;   % 1 - random walk, 2 - still target
 
 
-nAgents = 3;   % number of agents
+nAgents = 2;   % number of agents
 nTargets =2;
 dx = 1;
-L = 10;
+L = 5;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -32,7 +32,7 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
-Tloc=[5 50]; % True initial location
+Tloc=[20 12]; % 50]; % True initial location
 
 
 Pkp1k = zeros(N,N);
@@ -104,8 +104,8 @@ for jj=1:nTargets
     end % Dynamic Model
 
     if DynamicModel == 2 % if target is still
-        Tloc(:,jj) = Tloc(1,jj)*ones(1,length(tspan));
-        xTarget = xTarget*0;
+        Tloc = Tloc.*ones(length(tspan),nTargets);
+        xTarget{jj} = xTarget{jj}*0;
         xTarget{jj}(Tloc(1,jj),:)=1;
     end
 end
@@ -121,7 +121,7 @@ for jj=1:nTargets
 
         for ii=1:nAgents
             for nn=1:N
-                pyx = pyxCell(GridCellTarget(kk,jj),nn);
+                pyx = pyxCell(GridCellTarget(kk,jj),nn); 
                 yMeas{ii,jj}(nn,kk) = randsample(s,2,1,true,[1-pyx pyx])-1;
             end
         end
@@ -156,7 +156,7 @@ if plotFlag    % plotting target trajectory
 end
 
 %% State Transition Matrix
-% T(s'|s,a) -->  T{a}(s,s')
+% P(s'|s,a) -->  P{a}(s,s')
 % a = 1 - up, a = 2 - down
 % a = 3 - right, a = 4 - left
 % a = 5 - stay
@@ -164,9 +164,12 @@ end
 cAgent = whoRmyNeighbours(ni,nj,2);
 
 for a = 1:5
-    T{a} = BuildTransitionMatrix(cAgent,a,ni,nj);
+    P{a} = BuildTransitionMatrix(cAgent,a,ni,nj);
 end 
 
 
+%% MDP solution
+
+[Pol,Val] = MDP_FinalProject(P,Tloc,nAgents,nTargets,N);
 
 
