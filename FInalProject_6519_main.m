@@ -30,7 +30,7 @@ x = [1:1:length(Xgrid)]';
 ni = size(X1,1);
 nj = size(X1,2);
 N = length(x);
-[c] = whoRmyNeighbours(ni,nj);
+cTarget = whoRmyNeighbours(ni,nj,1);
 
 Tloc=[5 50]; % True initial location
 
@@ -39,9 +39,9 @@ Pkp1k = zeros(N,N);
 
 % given that i'm in cell # jj the probability to go to cell #ii
 for jj=1:N  
-    nN = size(c{jj,1},2); % # of neighbours
+    nN = size(cTarget{jj,1},2); % # of neighbours
     for ii=1:nN 
-        Pkp1k(c{jj,1}(ii),jj) = 1/nN;
+        Pkp1k(cTarget{jj,1}(ii),jj) = 1/nN;
     end
 end
 
@@ -154,4 +154,19 @@ if plotFlag    % plotting target trajectory
     plot(x1TrueVec(1:k2print-1),x2TrueVec(1:k2print-1),'r--')
     grid on
 end
+
+%% State Transition Matrix
+% T(s'|s,a) -->  T{a}(s,s')
+% a = 1 - up, a = 2 - down
+% a = 3 - right, a = 4 - left
+% a = 5 - stay
+% Rows sum up to 1
+cAgent = whoRmyNeighbours(ni,nj,2);
+
+for a = 1:5
+    T{a} = BuildTransitionMatrix(cAgent,a,ni,nj);
+end 
+
+
+
 
