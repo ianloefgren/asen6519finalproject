@@ -1,4 +1,4 @@
-function [Pol,Val] = MDP_FinalProject(P,Tloc,nAgents,nTargets,N)
+function [Pol,Val] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -13,13 +13,17 @@ function [Pol,Val] = MDP_FinalProject(P,Tloc,nAgents,nTargets,N)
 
 % Transition matrix:
 % P(s'|s,a) -->  P{a}(s,s')
-% a = 1 - up, a = 2 - down
-% a = 3 - right, a = 4 - left
-% a = 5 - stay
+% a = 1 - stay
+% a = 2 - up, a = 3 - down
+% a = 4 - right, a = 5 - left
 
-% Tloc - Target location:
+
+% DynamicModel:  1 - random walk, 2 - still target
+
+
 % Gives target cell in every time step.
 gamma = 0.95;  % Discount factor
+epsU = 1e-5;
 
 % Build state-space:
 v = 1:N;
@@ -38,7 +42,7 @@ for ii=1:nAgents-1
 end
 A=eval(['combvec(',str,')']);
 
-
+% Build Transition matrix
 for s=1:size(X,2)  % States
     for a=1:size(A,2)  % Actions
         if s==1
@@ -49,6 +53,9 @@ for s=1:size(X,2)  % States
         for ii= 1:nAgents
             Ptmp(ii,:) = P{A(ii,a)}(X(ii+nTargets,s),:);
             indCell{ii} = find(Ptmp(ii,:)~=0);
+%             if DynamicModel==2  % still target
+%                 1;
+%             end
             stateSize = stateSize*size(indCell{ii},2);
             str = [str,['indCell{',num2str(ii),'},']];
         end
@@ -56,12 +63,18 @@ for s=1:size(X,2)  % States
         TmpStateVec = eval(['combvec(',str(1:end-1),')']);
         
         
-            for jj=1:size(TmpStateVec,2)
+            for jj=1:size(TmpStateVec,2)             
+                
                 if nAgents>1
                     [row,stateInd] = find(sum(X(nTargets+1:end,:)==TmpStateVec(:,jj))==nAgents);
                 else
                     [row,stateInd] = find(X(nTargets+1:end,:)==TmpStateVec(:,jj));
                 end
+                
+                if DynamicModel==2  % still target
+                    stateInd = stateInd(find(X(1:nTargets,stateInd)==X(1:nTargets,s)));                  
+                    
+                end 
                 if sum(T{a}(s,stateInd))==0
                     T{a}(s,stateInd)=1;
                 end
@@ -69,7 +82,8 @@ for s=1:size(X,2)  % States
                     T{a}(s,stateInd) = T{a}(s,stateInd)*Ptmp(1,TmpStateVec(nn,jj));
                 end
             end
-        
+            
+        T{a}(s,:) = T{a}(s,:)/sum(T{a}(s,:));  % normalize
     end
 end
 
@@ -108,22 +122,35 @@ end
 % Utility
 U = min(R(:,1))*ones(size(R));
 
-for k=1:1000
-    Utmp = zeros(1,size(A,2));
+k=1;
+deltaU=1;
+while deltaU(k)>epsU
+    
     for s=1:size(X,2)  % current state
+        Utmp = zeros(1,size(A,2));
         for a=1:size(A,2)   % actions
             for sp1 = 1:size(X,2) % next state
-                Utmp(1,a) = Utmp(1,a)+T{a}(s,sp1)*U(sp1,k);
+                Utmp(1,a) = Utmp(1,a)+T{a}(s,sp1).*U(sp1,k);
             end
         end
-        U(s,k+1) = R(s,1)+gamma*max(Utmp(1,:),[],2);
+%          = R(s,1)+gamma*max(Utmp(1,:),[],2);
+        [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
     end
    
+    k=k+1; 
+    deltaU(k) = max(abs(1-U(:,k)./U(:,k-1)));
+    
+    if k>1000
+        break
+    end
+    
+    
+    
     
 end
 
-
-
+Val = U(:,end);
+ 
 
 
 end
