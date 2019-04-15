@@ -12,8 +12,8 @@ s = RandStream('mlfg6331_64');
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
 
-nAgents = 2;   % number of agents
-nTargets =2;
+nAgents = 1;   % number of agents
+nTargets =1;
 dx = 1;
 L = 5;
 xspace = dx/2:dx:L-dx/2;
@@ -32,7 +32,7 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
-Tloc=[20 12]; % 50]; % True initial location
+Tloc=[3]; % 50]; % True initial location
 
 
 Pkp1k = zeros(N,N);
@@ -157,12 +157,14 @@ end
 
 %% State Transition Matrix
 % P(s'|s,a) -->  P{a}(s,s')
-% a = 1 - up, a = 2 - down
-% a = 3 - right, a = 4 - left
-% a = 5 - stay
+% a = 1 - stay
+% a = 2 - up, a = 3 - down
+% a = 4 - right, a = 5 - left
+
 % Rows sum up to 1
 cAgent = whoRmyNeighbours(ni,nj,2);
 
+% for a single agent:
 for a = 1:5
     P{a} = BuildTransitionMatrix(cAgent,a,ni,nj);
 end 
@@ -170,6 +172,6 @@ end
 
 %% MDP solution
 
-[Pol,Val] = MDP_FinalProject(P,Tloc,nAgents,nTargets,N);
+[Pol,Val] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
 
