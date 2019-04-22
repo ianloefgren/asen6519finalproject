@@ -1,4 +1,4 @@
-function [Pol,Val] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
+function [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
