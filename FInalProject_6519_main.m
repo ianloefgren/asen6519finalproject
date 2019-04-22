@@ -15,7 +15,7 @@ DynamicModel = 2;   % 1 - random walk, 2 - still target
 nAgents = 1;   % number of agents
 nTargets =1;
 dx = 1;
-L = 5;
+L = 4;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -172,6 +172,34 @@ end
 
 %% MDP solution
 
-[Pol,Val] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+[Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+
+
+ind = find(X(1,:)==7);
+
+polSlice = Pol(ind);
+X2=flipud(X2);
+
+for ii=1:length(polSlice)
+   if polSlice(ii)==1
+       u(ii,1) = 0;
+       v(ii,1) = 0;
+   elseif polSlice(ii)==2
+       u(ii,1) = 0;
+       v(ii,1) = 1;
+   elseif polSlice(ii)==3
+       u(ii,1) = 0;
+       v(ii,1) = -1;   
+   elseif polSlice(ii)==4
+       u(ii,1) = 1;
+       v(ii,1) = 0;        
+   else 
+       u(ii,1) = -1;
+       v(ii,1) = 0;
+   end    
+end
+    
+
+
 
 
