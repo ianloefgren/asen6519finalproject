@@ -174,30 +174,35 @@ end
 
 [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
+target_loc = 7;
 
-ind = find(X(1,:)==7);
+ind = find(X(1,:)==target_loc);
 
 polSlice = Pol(ind);
-X2=flipud(X2);
+utilSlice = Val(ind);
+X2=flipud(X);
 
-for ii=1:length(polSlice)
-   if polSlice(ii)==1
-       u(ii,1) = 0;
-       v(ii,1) = 0;
-   elseif polSlice(ii)==2
-       u(ii,1) = 0;
-       v(ii,1) = 1;
-   elseif polSlice(ii)==3
-       u(ii,1) = 0;
-       v(ii,1) = -1;   
-   elseif polSlice(ii)==4
-       u(ii,1) = 1;
-       v(ii,1) = 0;        
-   else 
-       u(ii,1) = -1;
-       v(ii,1) = 0;
-   end    
-end
+% for ii=1:length(polSlice)
+%    if polSlice(ii)==1
+%        u(ii,1) = 0;
+%        v(ii,1) = 0;
+%    elseif polSlice(ii)==2
+%        u(ii,1) = 0;
+%        v(ii,1) = 1;
+%    elseif polSlice(ii)==3
+%        u(ii,1) = 0;
+%        v(ii,1) = -1;   
+%    elseif polSlice(ii)==4
+%        u(ii,1) = 1;
+%        v(ii,1) = 0;        
+%    else 
+%        u(ii,1) = -1;
+%        v(ii,1) = 0;
+%    end    
+% end
+
+%%
+plot_solution(utilSlice,polSlice,[L,L],target_loc);
     
 
 
