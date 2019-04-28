@@ -3,7 +3,7 @@
 % Runs simulations fkfkfk
 %
 
-function MDPsim(policy,transition_fxn,X,num_sims,num_agents,num_targets,num_states,dyn)
+function [trajectories, avg_num_moves, avg_cum_reward] = MDPsim(utility,policy,transition_fxn,X,num_sims,num_agents,num_targets,num_states,dyn)
 
     % Build Action-space:
     v = 1:5;
@@ -37,6 +37,7 @@ function MDPsim(policy,transition_fxn,X,num_sims,num_agents,num_targets,num_stat
            % transition fxn result
            s = randsample(num_states^(num_agents+num_targets),1,true,T);
            
+           % check to see if any target has been caught by agents
            for j=1:num_agents
                for k=1:num_targets
                    if X(j,s) == X(num_agents + k,s)
@@ -45,22 +46,16 @@ function MDPsim(policy,transition_fxn,X,num_sims,num_agents,num_targets,num_stat
                end
            end
            
+           % record action state pair, reward, and move count
            trajectories{i}(:,end+1) = [s;action];
-           
-%            agent_locations = states(1:num_agents);
-%            target_locations = states(num_agents+1:end);
-%            
-%            for j=1:length(agent_locations)
-%                for k=1:length(target_locations)
-%                    if agent_location(j) == target_locations(k)
-%                        caught_flags(k) = 1;
-%                    end
-%                end
-%            end
-           
+           cum_reward(i) = cum_reward(i) + utility(s);
            num_moves(i) = num_moves(i) + 1;
-%            cum_reward(i) = cum_reward(i) + utility(s);
                    
        end   
     end
+    
+    % compute average cumulative reward and number of moves
+    avg_num_moves = sum(num_moves)/num_sims;
+    avg_cum_reward = sum(cum_reward)/num_sims;
+    
 end
