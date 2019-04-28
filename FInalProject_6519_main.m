@@ -7,15 +7,15 @@ lw = 2;
 fs = 16;
 plotFlag = 0;
 AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
-s = RandStream('mlfg6331_64');
+seed = RandStream('mlfg6331_64');
 
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
-
-nAgents = 2;   % number of agents
-nTargets =1;
+% =======
+nAgents = 1;   % number of agents
+nTargets = 2;
 dx = 1;
-L = 3;
+L = 4;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -94,7 +94,7 @@ for jj=1:nTargets
     if DynamicModel == 1 % Random walk
 
     for kk=1:length(tspan)-1
-        Tloc(kk+1,jj)=randsample(s,100,1,true,Pkp1k(:,Tloc(kk,jj)));
+        Tloc(kk+1,jj)=randsample(seed,N,1,true,Pkp1k(:,Tloc(kk,jj)));
         xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
     end
 
@@ -122,7 +122,7 @@ for jj=1:nTargets
         for ii=1:nAgents
             for nn=1:N
                 pyx = pyxCell(GridCellTarget(kk,jj),nn); 
-                yMeas{ii,jj}(nn,kk) = randsample(s,2,1,true,[1-pyx pyx])-1;
+                yMeas{ii,jj}(nn,kk) = randsample(seed,2,1,true,[1-pyx pyx])-1;
             end
         end
 
@@ -174,44 +174,26 @@ end
 
 [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
-target_loc = 14;
 
-ind = find(X(1,:)==target_loc);
+%%
+target_loc = [15,3]';
 
+% ind = find(X(1,:)==target_loc);
+[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
 polSlice = Pol(ind);
 utilSlice = Val(ind);
 X2=flipud(X);
 
+% <<<<<<< HEAD
 plot_solution(utilSlice,polSlice,[L,L],target_loc);
+
+
+
+%%
+MDPsim(Pol,P,X,10,nAgents,nTargets,N,DynamicModel)
     
 
 %% POMDP
-% build likelihood function
-% values are for detection
-% pOX = ones(size(X,2),1);
-% pmx = eye(size(pyxCell));  % agent likelihood of own state m
-% O = [1 3 5]';
-% for s=1:size(X,2)
-%     for ii=1:nAgents
-%         for jj=1:nTargets
-%             if O(jj,1)==0
-%                 P_Like =1-pyxCell(X(jj,s),X(ii+nTargets,s));
-%             else
-%                 P_Like =pyxCell(X(jj,s),X(ii+nTargets,s));
-%             end
-%             
-%             pOX(s,1) = pOX(s,1)*pmx(O(ii+nTargets,1),X(ii+nTargets,s))*P_Like;
-%                
-%         end
-%     end
-% end
-
-
-
-
-
-
-
 
 
 [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag);
