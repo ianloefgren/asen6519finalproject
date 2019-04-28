@@ -1,4 +1,4 @@
-function [util_grid,policy_grid] = plot_solution(utility_vec,policy_vec,world_size,goal_loc)
+function [util_grid,policy_grid] = plot_solution(utility_vec,policy_vec,world_size,target_locations)
 
     for i=1:(world_size(1)*world_size(2))
         util_grid_loc = vec2grid(i,world_size);
@@ -26,7 +26,10 @@ function [util_grid,policy_grid] = plot_solution(utility_vec,policy_vec,world_si
         
     end
     
-    goal_loc = vec2grid(goal_loc,world_size);
+    target_locs_vec = zeros(size(target_locations,1),2);
+    for i=1:size(target_locations,1)
+        target_locs_grid(i,:) = vec2grid(target_locations(i),world_size);
+    end
     
 
     utility_plot_vec = reshape(utility_vec,world_size);
@@ -41,13 +44,15 @@ function [util_grid,policy_grid] = plot_solution(utility_vec,policy_vec,world_si
 %         
 %     end
     quiver(policy_quiver_vec(:,2),policy_quiver_vec(:,1),policy_quiver_vec(:,3),policy_quiver_vec(:,4),'Color','k');
-    for i=1:size(goal_loc,1)
-        rectangle('Position',[goal_loc(i,2)-0.5, goal_loc(i,1)-0.5, 1, 1],'EdgeColor','k','LineWidth',1,'LineStyle','-.')
+    titlestr = '';
+    for i=1:size(target_locs_grid,1)
+        rectangle('Position',[target_locs_grid(i,2)-0.5, target_locs_grid(i,1)-0.5, 1, 1],'EdgeColor','k','LineWidth',1,'LineStyle','-.')
+        titlestr = strcat(titlestr,'(',num2str(target_locs_grid(i,1)),',',num2str(target_locs_grid(i,2)),'),');
     end
     
 %     colormap spring
-    titlestr = strcat('Utility fxn and policy, target at (',num2str(goal_loc(1)),',',num2str(goal_loc(2)),')');
-    title(titlestr)
+%     titlestr = strcat('Utility fxn and policy, target at (',num2str(target_loc(1)),',',num2str(target_loc(2)),')');
+    title(strcat('Utility fxn and policy for targets located at: ',titlestr))
     
 end
 

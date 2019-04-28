@@ -9,13 +9,13 @@ plotFlag = 0;
 
 s = RandStream('mlfg6331_64');
 
-DynamicModel = 2;   % 1 - random walk, 2 - still target
+DynamicModel = 1;   % 1 - random walk, 2 - still target
 
 
 nAgents = 1;   % number of agents
-nTargets =1;
+nTargets = 1;
 dx = 1;
-L = 4;
+L = 6;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -94,7 +94,7 @@ for jj=1:nTargets
     if DynamicModel == 1 % Random walk
 
     for kk=1:length(tspan)-1
-        Tloc(kk+1,jj)=randsample(s,100,1,true,Pkp1k(:,Tloc(kk,jj)));
+        Tloc(kk+1,jj)=randsample(s,N,1,true,Pkp1k(:,Tloc(kk,jj)));
         xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
     end
 
@@ -174,7 +174,8 @@ end
 
 [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
-target_loc = 7;
+%%
+target_loc = [7];
 
 ind = find(X(1,:)==target_loc);
 
@@ -202,7 +203,9 @@ X2=flipud(X);
 % end
 
 %%
-plot_solution(utilSlice,polSlice,[L,L],target_loc);
+% plot_solution(utilSlice,polSlice,[L,L],target_loc);
+%%
+MDPsim(Pol,P,X,10,nAgents,nTargets,N,DynamicModel)
     
 
 
