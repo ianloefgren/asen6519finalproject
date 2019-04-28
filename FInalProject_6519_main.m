@@ -6,16 +6,16 @@ clear all; clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
-
+AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 s = RandStream('mlfg6331_64');
 
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
 
-nAgents = 1;   % number of agents
+nAgents = 2;   % number of agents
 nTargets =1;
 dx = 1;
-L = 4;
+L = 3;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -172,9 +172,9 @@ end
 
 %% MDP solution
 
-[Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
-target_loc = 7;
+target_loc = 14;
 
 ind = find(X(1,:)==target_loc);
 
@@ -182,29 +182,37 @@ polSlice = Pol(ind);
 utilSlice = Val(ind);
 X2=flipud(X);
 
-% for ii=1:length(polSlice)
-%    if polSlice(ii)==1
-%        u(ii,1) = 0;
-%        v(ii,1) = 0;
-%    elseif polSlice(ii)==2
-%        u(ii,1) = 0;
-%        v(ii,1) = 1;
-%    elseif polSlice(ii)==3
-%        u(ii,1) = 0;
-%        v(ii,1) = -1;   
-%    elseif polSlice(ii)==4
-%        u(ii,1) = 1;
-%        v(ii,1) = 0;        
-%    else 
-%        u(ii,1) = -1;
-%        v(ii,1) = 0;
-%    end    
-% end
-
-%%
 plot_solution(utilSlice,polSlice,[L,L],target_loc);
     
 
+%% POMDP
+% build likelihood function
+% values are for detection
+% pOX = ones(size(X,2),1);
+% pmx = eye(size(pyxCell));  % agent likelihood of own state m
+% O = [1 3 5]';
+% for s=1:size(X,2)
+%     for ii=1:nAgents
+%         for jj=1:nTargets
+%             if O(jj,1)==0
+%                 P_Like =1-pyxCell(X(jj,s),X(ii+nTargets,s));
+%             else
+%                 P_Like =pyxCell(X(jj,s),X(ii+nTargets,s));
+%             end
+%             
+%             pOX(s,1) = pOX(s,1)*pmx(O(ii+nTargets,1),X(ii+nTargets,s))*P_Like;
+%                
+%         end
+%     end
+% end
 
 
+
+
+
+
+
+
+
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag);
 
