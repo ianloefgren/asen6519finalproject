@@ -11,11 +11,20 @@ seed = RandStream('mlfg6331_64');
 
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
+<<<<<<< HEAD
 % =======
 nAgents = 2;   % number of agents
 nTargets = 1;
 dx = 1;
 L = 3;
+=======
+DynamicModel = 1;   % 1 - random walk, 2 - still target
+
+nAgents = 1;   % number of agents
+nTargets = 2;
+dx = 1;
+L = 4;
+>>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -32,7 +41,11 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
+<<<<<<< HEAD
 Tloc=[3,7]; % 50]; % True initial location
+=======
+Tloc=[3,6]; % 50]; % True initial location
+>>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 
 
 Pkp1k = zeros(N,N);
@@ -174,9 +187,17 @@ end
 
 [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
+<<<<<<< HEAD
 
 %%
 target_loc = [15,3]';
+=======
+%%
+target_loc = [5,12]';
+
+% ind = find(X(1,:) == target_loc(1));
+[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
+>>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 
 % ind = find(X(1,:)==target_loc);
 [row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
@@ -189,8 +210,15 @@ plot_solution(utilSlice,polSlice,[L,L],target_loc);
 
 
 
+<<<<<<< HEAD
+=======
 %%
-MDPsim(Pol,P,X,10,nAgents,nTargets,N,DynamicModel)
+if DynamicModel == 2
+    plot_solution(utilSlice,polSlice,[L,L],target_loc);
+end
+>>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
+%%
+ [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
     
 
 %% POMDP
