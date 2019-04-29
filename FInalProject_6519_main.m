@@ -11,11 +11,10 @@ s = RandStream('mlfg6331_64');
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-
 nAgents = 1;   % number of agents
-nTargets = 1;
+nTargets = 2;
 dx = 1;
-L = 6;
+L = 4;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -32,7 +31,7 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
-Tloc=[3]; % 50]; % True initial location
+Tloc=[3,6]; % 50]; % True initial location
 
 
 Pkp1k = zeros(N,N);
@@ -175,9 +174,10 @@ end
 [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
 %%
-target_loc = [7];
+target_loc = [5,12]';
 
-ind = find(X(1,:)==target_loc);
+% ind = find(X(1,:) == target_loc(1));
+[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
 
 polSlice = Pol(ind);
 utilSlice = Val(ind);
@@ -203,9 +203,11 @@ X2=flipud(X);
 % end
 
 %%
-% plot_solution(utilSlice,polSlice,[L,L],target_loc);
+if DynamicModel == 2
+    plot_solution(utilSlice,polSlice,[L,L],target_loc);
+end
 %%
-MDPsim(Pol,P,X,10,nAgents,nTargets,N,DynamicModel)
+ [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
     
 
 
