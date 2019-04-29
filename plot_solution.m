@@ -32,8 +32,8 @@ function [util_grid,policy_grid] = plot_solution(utility_vec,policy_vec,world_si
     end
     
 
-    utility_plot_vec = reshape(utility_vec,world_size);
-    policy_plot_vec = reshape(policy_vec,world_size);
+%     utility_plot_vec = reshape(utility_vec,world_size);
+%     policy_plot_vec = reshape(policy_vec,world_size);
 
     figure
     hold on; grid on;
