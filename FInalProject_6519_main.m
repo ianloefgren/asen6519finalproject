@@ -2,7 +2,7 @@
 
 % column - agent number
 
-clear all; clc; close all;
+clear all;% clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
@@ -12,10 +12,10 @@ seed = RandStream('mlfg6331_64');
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
 % =======
-nAgents = 1;   % number of agents
-nTargets = 2;
+nAgents = 2;   % number of agents
+nTargets = 1;
 dx = 1;
-L = 4;
+L = 3;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -32,7 +32,7 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
-Tloc=[3]; % 50]; % True initial location
+Tloc=[3,7]; % 50]; % True initial location
 
 
 Pkp1k = zeros(N,N);
