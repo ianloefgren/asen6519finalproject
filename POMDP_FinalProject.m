@@ -1,4 +1,4 @@
-function [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,pyxCell,yMeas,AlgoFlag)
+function [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,pyxCell,yMeas,AlgoFlag,S_A)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -62,6 +62,7 @@ else % FIB
    
     end 
 end
+
 
 
 % Bayes update
