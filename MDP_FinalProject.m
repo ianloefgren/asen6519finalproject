@@ -1,4 +1,4 @@
-function [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
+function [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -23,7 +23,7 @@ function [Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
 
 % Gives target cell in every time step.
 gamma = 0.95;  % Discount factor
-epsU = 1e-5;
+epsU = 1e-3;
 
 % Build state-space:
 v = 1:N;
@@ -108,7 +108,7 @@ for jj=1:size(X,2)
             interCount(find(x(ii)==x(1:nTargets))) = interCount(find(x(ii)==x(1:nTargets)))+1;
                 
         elseif sum(x(ii)== x(ii+1:nAgents+nTargets))  % 2 agents in the same cell
-                R(jj)=R(jj)-50;   
+                R(jj)=R(jj)-10;   
         else   % loitering
             R(jj)=R(jj)-1;
         end      
@@ -131,11 +131,9 @@ while deltaU(k)>epsU
         for a=1:size(A,2)   % actions
             [T] = BuildTransitionMatrix2(s,a,X,nAgents,nTargets,P,A,DynamicModel);
             for sp1 = 1:size(X,2) % next state
-%                 Utmp(1,a) = Utmp(1,a)+T{a}(s,sp1).*U(sp1,k);
                   Utmp(1,a) = Utmp(1,a)+T(1,sp1).*U(sp1,k);
             end
         end
-%          = R(s,1)+gamma*max(Utmp(1,:),[],2);
         [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
     end
    
