@@ -1,14 +1,14 @@
-function [Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag)
+function [Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k)
 
 
 % QMDP  
 if AlgoFlag==1 %QMDP
     for s=1:size(X,2)  % current state
         Qtmp = zeros(1,size(A,2));
+        [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         for a=1:size(A,2)   % actions
-            [T] = BuildTransitionMatrix2(s,a,X,nAgents,nTargets,P,A,DynamicModel);
             for sp1 = 1:size(X,2) % next state
-                  Qtmp(1,a) = Qtmp(1,a)+T(1,sp1).*vMDP(sp1);
+                  Qtmp(1,a) = Qtmp(1,a)+T(a,sp1).*vMDP(sp1);
             end
             Q(s,a) = R(s,1)+Qtmp(1,a);
         end
@@ -17,7 +17,7 @@ if AlgoFlag==1 %QMDP
 else % FIB
     for s=1:size(X,2)  % current state
         Qtmp = zeros(1,size(A,2));
-        [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel);
+        [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         for a=1:size(A,2)   % actions
             
             for sp1 = 1:size(X,2) % next state
