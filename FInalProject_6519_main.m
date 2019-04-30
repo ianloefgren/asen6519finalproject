@@ -9,22 +9,13 @@ plotFlag = 0;
 AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 
+
 DynamicModel = 2;   % 1 - random walk, 2 - still target
 
-<<<<<<< HEAD
-% =======
 nAgents = 2;   % number of agents
 nTargets = 1;
 dx = 1;
 L = 3;
-=======
-DynamicModel = 1;   % 1 - random walk, 2 - still target
-
-nAgents = 1;   % number of agents
-nTargets = 2;
-dx = 1;
-L = 4;
->>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -41,11 +32,8 @@ nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
-<<<<<<< HEAD
-Tloc=[3,7]; % 50]; % True initial location
-=======
+
 Tloc=[3,6]; % 50]; % True initial location
->>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 
 
 Pkp1k = zeros(N,N);
@@ -187,20 +175,20 @@ end
 
 [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
 
-<<<<<<< HEAD
+% <<<<<<< HEAD
 
 %%
 target_loc = [15,3]';
-=======
+% =======
 %%
-target_loc = [5,12]';
+target_loc = [5]';
 
-% ind = find(X(1,:) == target_loc(1));
-[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
->>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
+if nTargets==1
+    ind = find(X(1,:) == target_loc(1));
+else
+    [row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
+end
 
-% ind = find(X(1,:)==target_loc);
-[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
 polSlice = Pol(ind);
 utilSlice = Val(ind);
 X2=flipud(X);
@@ -210,19 +198,40 @@ plot_solution(utilSlice,polSlice,[L,L],target_loc);
 
 
 
-<<<<<<< HEAD
-=======
+% <<<<<<< HEAD
+% =======
 %%
 if DynamicModel == 2
     plot_solution(utilSlice,polSlice,[L,L],target_loc);
 end
->>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
+% >>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 %%
- [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
+%  [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
     
 
 %% POMDP
+%% Build likelihood model to generate measurements 
+% PojX is the joint likelihood of detecting a target in cell jj, given the state
+% of the agents is sA
+
+v = 1:N;
+str = 'v';
+for ii=1:nAgents-1
+    str = [str,',v'];
+end
+S_A=eval(['combvec(',str,')']);
+
+pmx = eye(size(pyxCell));  % agent likelihood of own state m
+pOjX = ones(N,size(S_A,2));
+for sA=1:size(S_A,2)
+    for jj=1:N
+        for ii=1:nAgents  
+            P_Like =pyxCell(jj,S_A(ii,sA));
+            pOjX(jj,sA) = pOjX(jj,sA)*P_Like;
+        end
+    end
+end
 
 
-[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag);
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag,S_A);
 
