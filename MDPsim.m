@@ -42,29 +42,31 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
 %            states = transition_fxn{actions}*states;
 
            % generate transitions for agents
-           T_agent = BuildTransitionMatrix2(s,action,X,num_agents,num_targets,transition_fxn,action_space,dyn);
+           T= BuildTransitionMatrix2(s,action,X,num_agents,num_targets,transition_fxn,action_space,dyn);
            
-           % extract seperate agent and target states from full state
-           s_expanded = X(:,s);
-           
-           % compute agent state using sampled full state and action
-           s_agents = randsample(num_states^(num_agents+num_targets),1,true,T_agent); % agents transition
-           s_agents_expanded = X(1:num_agents,s_agents);
-           
-           for j=num_agents+1:size(s_expanded,1)
-               
-               if j <= num_agents
-                   s_expanded(j) = randsample(num_states,1,true,T); % agents transition
-               else
-                   s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,s_expanded(j))); % targets transition
-               end
-           end
-           
-           % add agent states to new expanded state
-           s_expanded(1:num_agents) = s_agents_expanded;
-           % find the vectorized state index that matches expanded state
-           s = find(sum(X==s_expanded)==num_targets+num_agents);
-           
+%            % extract seperate agent and target states from full state
+%            s_expanded = X(:,s);
+%            
+%            % compute agent state using sampled full state and action
+%            s_agents = randsample(num_states^(num_agents+num_targets),1,true,T_agent); % agents transition
+%            s_agents_expanded = X(1:num_agents,s_agents);
+%            
+%            for j=num_agents+1:size(s_expanded,1)
+%                
+%                if j <= num_agents
+%                    s_expanded(j) = randsample(num_states,1,true,T); % agents transition
+%                else
+%                    s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,s_expanded(j))); % targets transition
+%                end
+%            end
+%            
+%            % add agent states to new expanded state
+%            s_expanded(1:num_agents) = s_agents_expanded;
+%            % find the vectorized state index that matches expanded state
+%            s = find(sum(X==s_expanded)==num_targets+num_agents);
+%            
+           s = randsample(num_states^(num_agents+num_targets),1,true,T);
+            
            for j=1:num_agents
                for k=1:num_targets
                    if X(j,s) == X(num_agents + k,s)
@@ -88,28 +90,30 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
 %            states = transition_fxn{actions}*states;
 
            % generate transitions for agents
-           greedy_T_agent = BuildTransitionMatrix2(greedy_s,greedy_a,X,num_agents,num_targets,transition_fxn,action_space,dyn);
+           greedy_T = BuildTransitionMatrix2(greedy_s,greedy_a,X,num_agents,num_targets,transition_fxn,action_space,dyn);
            
-           % extract seperate agent and target states from full state
-           greedy_s_expanded = X(:,greedy_s);
-           
-           % compute agent state using sampled full state and action
-           greedy_s_agents = randsample(num_states^(num_agents+num_targets),1,true,greedy_T_agent); % agents transition
-           greedy_s_agents_expanded = X(1:num_agents,greedy_s_agents);
-           
-           for j=num_agents+1:size(greedy_s_expanded,1)
-               
-               if j <= num_agents
-                   greedy_s_expanded(j) = randsample(num_states,1,true,greedy_T_agent); % agents transition
-               else
-                   greedy_s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,greedy_s_expanded(j))); % targets transition
-               end
-           end
-           
-           % add agent states to new expanded state
-           greedy_s_expanded(1:num_agents) = greedy_s_agents_expanded;
-           % find the vectorized state index that matches expanded state
-           greedy_s = find(sum(X==greedy_s_expanded)==num_targets+num_agents);
+%            % extract seperate agent and target states from full state
+%            greedy_s_expanded = X(:,greedy_s);
+%            
+%            % compute agent state using sampled full state and action
+%            greedy_s_agents = randsample(num_states^(num_agents+num_targets),1,true,greedy_T_agent); % agents transition
+%            greedy_s_agents_expanded = X(1:num_agents,greedy_s_agents);
+%            
+%            for j=num_agents+1:size(greedy_s_expanded,1)
+%                
+%                if j <= num_agents
+%                    greedy_s_expanded(j) = randsample(num_states,1,true,greedy_T_agent); % agents transition
+%                else
+%                    greedy_s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,greedy_s_expanded(j))); % targets transition
+%                end
+%            end
+%            
+%            % add agent states to new expanded state
+%            greedy_s_expanded(1:num_agents) = greedy_s_agents_expanded;
+%            % find the vectorized state index that matches expanded state
+%            greedy_s = find(sum(X==greedy_s_expanded)==num_targets+num_agents);
+
+            greedy_s = randsample(num_states^(num_agents+num_targets),1,true,greedy_T);
            
            % check to see if any target has been caught by agents
            for j=1:num_agents
@@ -122,8 +126,8 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
            
            % record action state pair, reward, and move count
            greedy_trajectories{i}(:,end+1) = [greedy_s;greedy_a;greedy_caught_flags'];
-           greedy_cum_reward(i) = cum_reward(i) + utility(greedy_s);
-           greedy_num_moves(i) = num_moves(i) + 1;        
+           greedy_cum_reward(i) = greedy_cum_reward(i) + utility(greedy_s);
+           greedy_num_moves(i) = greedy_num_moves(i) + 1;        
        end    
     end
     
