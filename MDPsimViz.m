@@ -42,28 +42,6 @@ function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
     figure
     hold on;
     
-    for i=1:size(world_locations,2)
-        for j=1:size(world_locations,1)
-            
-            grid_coord = vec2grid(world_locations(j,i),world_size);
-            marker_color = color_wheel(j,:);
-            
-            if i==1
-%                 marker_color = 'k';
-                next_coord = vec2grid(world_locations(j,i+1),world_size);
-            elseif i==size(world_locations,2)
-%                 marker_color = 'k';
-                next_coord = grid_coord;
-            else
-                next_coord = vec2grid(world_locations(j,i+1),world_size);
-                marker_color = color_wheel(j,:);
-            end
-            
-            quiver(grid_coord(2),grid_coord(1),next_coord(2)-grid_coord(2),next_coord(1)-grid_coord(1),'Color',marker_color)
-%             plot(grid_coord(1),grid_coord(2),markers(j),'Color',marker_color,'MarkerSize',10)
-        end
-    end
-    
     % create grid cell 
     for i=1:world_size(1)
         for j=1:world_size(2)
@@ -72,7 +50,44 @@ function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
     end
     rectangle('Position',[0.5,0.5,world_size(1),world_size(2)],'EdgeColor','k','LineWidth',2)
     
-    legend('target 1','target 2','agent 1','Location','NorthEastOutside')
+    % plot trajectories
+    for i=1:size(world_locations,2)
+        plot_flag = true;
+        for j=1:size(world_locations,1)
+            
+            grid_coord = vec2grid(world_locations(j,i),world_size);
+            marker_color = color_wheel(j,:);
+            
+            if i==1
+%                 marker_color = 'k';
+                next_coord = vec2grid(world_locations(j,i+1),world_size);
+                plot(grid_coord(2),grid_coord(1),markers(j),'Color','k','MarkerSize',10)
+            elseif i==size(world_locations,2)
+                marker_color = 'k';
+                next_coord = grid_coord;
+            else
+                next_coord = vec2grid(world_locations(j,i+1),world_size);
+                marker_color = color_wheel(j,:);
+            end
+            
+            
+            if j>num_agents
+                if trajectory(1+j,i)
+                    plot_flag = false;
+                end
+            end
+            
+            if plot_flag
+                quiver(grid_coord(2),grid_coord(1),next_coord(2)-grid_coord(2),next_coord(1)-grid_coord(1),'Color',marker_color)
+                text(grid_coord(2)+0.5*(next_coord(2)-grid_coord(2)),grid_coord(1)+0.5*(next_coord(1)-grid_coord(1)),strcat('t=',num2str(i)))
+            end
+%             plot(grid_coord(1),grid_coord(2),markers(j),'Color',marker_color,'MarkerSize',10)
+        end
+        input('press enter to display next timestep')
+    end
+    
+%     legend('target 1','target 2','agent 1','Location','NorthEastOutside')
+    legend('agent 1','target 1','target 2','Location','NorthEastOutside')
 end
 
 
