@@ -1,4 +1,4 @@
-function [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel)
+function [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -42,52 +42,6 @@ for ii=1:nAgents-1
 end
 A=eval(['combvec(',str,')']);
 
-% Build Transition matrix
-% for s=1:size(X,2)  % States
-%     for a=1:size(A,2)  % Actions
-%         if s==1
-%             T{a} = zeros(size(X,2),size(X,2));
-%         end
-%         stateSize=1;
-%         str = '';
-%         for ii= 1:nAgents
-%             Ptmp(ii,:) = P{A(ii,a)}(X(ii+nTargets,s),:);
-%             indCell{ii} = find(Ptmp(ii,:)~=0);
-% %             if DynamicModel==2  % still target
-% %                 1;
-% %             end
-%             stateSize = stateSize*size(indCell{ii},2);
-%             str = [str,['indCell{',num2str(ii),'},']];
-%         end
-%         
-%         TmpStateVec = eval(['combvec(',str(1:end-1),')']);
-%         
-%         
-%             for jj=1:size(TmpStateVec,2)             
-%                 
-%                 if nAgents>1
-%                     [row,stateInd] = find(sum(X(nTargets+1:end,:)==TmpStateVec(:,jj))==nAgents);
-%                 else
-%                     [row,stateInd] = find(X(nTargets+1:end,:)==TmpStateVec(:,jj));
-%                 end
-%                 
-%                 if DynamicModel==2  % still target
-%                     stateInd = stateInd(find(X(1:nTargets,stateInd)==X(1:nTargets,s)));                  
-%                     
-%                 end 
-%                 if sum(T{a}(s,stateInd))==0
-%                     T{a}(s,stateInd)=1;
-%                 end
-%                 for nn=1:nAgents                
-%                     T{a}(s,stateInd) = T{a}(s,stateInd)*Ptmp(1,TmpStateVec(nn,jj));
-%                 end
-%             end
-%             
-%         T{a}(s,:) = T{a}(s,:)/sum(T{a}(s,:));  % normalize
-%     end
-% end
-
-
 % Build Reward 
 R = 0*ones(size(X,2),1);
 interCount = zeros(nTargets,1); % tracking which target had been caught
@@ -128,10 +82,10 @@ while deltaU(k)>epsU
     
     for s=1:size(X,2)  % current state
         Utmp = zeros(1,size(A,2));
+        [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         for a=1:size(A,2)   % actions
-            [T] = BuildTransitionMatrix2(s,a,X,nAgents,nTargets,P,A,DynamicModel);
             for sp1 = 1:size(X,2) % next state
-                  Utmp(1,a) = Utmp(1,a)+T(1,sp1).*U(sp1,k);
+                  Utmp(1,a) = Utmp(1,a)+T(a,sp1).*U(sp1,k);
             end
         end
         [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
