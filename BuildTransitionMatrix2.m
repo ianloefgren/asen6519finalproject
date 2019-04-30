@@ -52,8 +52,12 @@ for jj=1:size(TmpStateVec,2)
         T(1,stateInd)=1;
     end
     for nn=1:nAgents                
-        T(1,stateInd) = T(1,stateInd)*Ptmp(1,TmpStateVec(nn,jj));
+        T(1,stateInd) = T(1,stateInd)*Ptmp(nn,TmpStateVec(nn,jj));
     end
 end
-
+if sum(T(1,:))==0
+    1;
+end
 T(1,:) = T(1,:)/sum(T(1,:));  % normalize
+
+

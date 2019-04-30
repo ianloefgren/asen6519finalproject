@@ -2,19 +2,20 @@
 
 % column - agent number
 
-clear all; clc; close all;
+clear all;% clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
+AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
+seed = RandStream('mlfg6331_64');
 
-s = RandStream('mlfg6331_64');
 
-DynamicModel = 1;   % 1 - random walk, 2 - still target
+DynamicModel = 2;   % 1 - random walk, 2 - still target
 
-nAgents = 1;   % number of agents
-nTargets = 2;
+nAgents = 2;   % number of agents
+nTargets = 1;
 dx = 1;
-L = 4;
+L = 3;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -30,6 +31,7 @@ ni = size(X1,1);
 nj = size(X1,2);
 N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
+
 
 Tloc=[3,6]; % 50]; % True initial location
 
@@ -93,7 +95,7 @@ for jj=1:nTargets
     if DynamicModel == 1 % Random walk
 
     for kk=1:length(tspan)-1
-        Tloc(kk+1,jj)=randsample(s,N,1,true,Pkp1k(:,Tloc(kk,jj)));
+        Tloc(kk+1,jj)=randsample(seed,N,1,true,Pkp1k(:,Tloc(kk,jj)));
         xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
     end
 
@@ -121,7 +123,7 @@ for jj=1:nTargets
         for ii=1:nAgents
             for nn=1:N
                 pyx = pyxCell(GridCellTarget(kk,jj),nn); 
-                yMeas{ii,jj}(nn,kk) = randsample(s,2,1,true,[1-pyx pyx])-1;
+                yMeas{ii,jj}(nn,kk) = randsample(seed,2,1,true,[1-pyx pyx])-1;
             end
         end
 
@@ -171,45 +173,65 @@ end
 
 %% MDP solution
 
-[Pol,Val,X] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+
+% <<<<<<< HEAD
 
 %%
-target_loc = [5,12]';
+target_loc = [15,3]';
+% =======
+%%
+target_loc = [5]';
 
-% ind = find(X(1,:) == target_loc(1));
-[row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
+if nTargets==1
+    ind = find(X(1,:) == target_loc(1));
+else
+    [row,ind]= find(sum(X(1:nTargets,:)==target_loc)==nTargets);
+end
 
 polSlice = Pol(ind);
 utilSlice = Val(ind);
 X2=flipud(X);
 
-% for ii=1:length(polSlice)
-%    if polSlice(ii)==1
-%        u(ii,1) = 0;
-%        v(ii,1) = 0;
-%    elseif polSlice(ii)==2
-%        u(ii,1) = 0;
-%        v(ii,1) = 1;
-%    elseif polSlice(ii)==3
-%        u(ii,1) = 0;
-%        v(ii,1) = -1;   
-%    elseif polSlice(ii)==4
-%        u(ii,1) = 1;
-%        v(ii,1) = 0;        
-%    else 
-%        u(ii,1) = -1;
-%        v(ii,1) = 0;
-%    end    
-% end
+% <<<<<<< HEAD
+plot_solution(utilSlice,polSlice,[L,L],target_loc);
 
+
+
+% <<<<<<< HEAD
+% =======
 %%
 if DynamicModel == 2
     plot_solution(utilSlice,polSlice,[L,L],target_loc);
 end
+% >>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 %%
- [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
+%  [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
     
 
+%% POMDP
+%% Build likelihood model to generate measurements 
+% PojX is the joint likelihood of detecting a target in cell jj, given the state
+% of the agents is sA
+
+v = 1:N;
+str = 'v';
+for ii=1:nAgents-1
+    str = [str,',v'];
+end
+S_A=eval(['combvec(',str,')']);
+
+pmx = eye(size(pyxCell));  % agent likelihood of own state m
+pOjX = ones(N,size(S_A,2));
+for sA=1:size(S_A,2)
+    for jj=1:N
+        for ii=1:nAgents  
+            P_Like =pyxCell(jj,S_A(ii,sA));
+            pOjX(jj,sA) = pOjX(jj,sA)*P_Like;
+        end
+    end
+end
 
 
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag,S_A);
 

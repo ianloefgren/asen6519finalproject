@@ -12,7 +12,7 @@ for ii=1:ni
    for jj=1:nj
        s = (jj-1)*ni+ii;
        if a==1 % stay
-           T(s,s)=0.8;
+           T(s,s)=1;
            T(s,c{s}(c{s}~=s)) = (1-T(s,s))/(length(c{s})-1);
        elseif a==2 % up
            if ii==ni %top row

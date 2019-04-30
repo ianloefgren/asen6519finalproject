@@ -65,7 +65,6 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
            % find the vectorized state index that matches expanded state
            s = find(sum(X==s_expanded)==num_targets+num_agents);
            
-           % check to see if any target has been caught by agents
            for j=1:num_agents
                for k=1:num_targets
                    if X(j,s) == X(num_agents + k,s)
