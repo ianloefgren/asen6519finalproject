@@ -49,11 +49,12 @@ if AlgoFlag==1 %QMDP
 else % FIB
     for s=1:size(X,2)  % current state
         Qtmp = zeros(1,size(A,2));
+        [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel);
         for a=1:size(A,2)   % actions
-            [T] = BuildTransitionMatrix2(s,a,X,nAgents,nTargets,P,A,DynamicModel);
+            
             for sp1 = 1:size(X,2) % next state
                 for o=1:nObs
-                  Qtmp(1,a) = Qtmp(1,a)+pyx*T(1,sp1).*vMDP(sp1);
+                  Qtmp(1,a) = Qtmp(1,a)+pyx*T(a,sp1).*vMDP(sp1);
             end
             Q(s,a) = R(s,1)+Qtmp(1,a);
         end
@@ -114,7 +115,7 @@ for kk=1:legth(t)
         
     % step k=1
     for s=1:size(X,2)  % current state
-        [T] = BuildTransitionMatrix2(s,a(s,1),X,nAgents,nTargets,P,A,DynamicModel);
+        [T] = BuildTransitionMatrix2(s,a(s,1),X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         % Prediction
         if kk==1
             pxy_m(s,1)=T*p0;
