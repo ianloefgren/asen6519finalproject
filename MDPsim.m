@@ -42,7 +42,8 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
 %            states = transition_fxn{actions}*states;
 
            % generate transitions for agents
-           T= BuildTransitionMatrix2(s,action,X,num_agents,num_targets,transition_fxn,action_space,dyn);
+           T= BuildTransitionMatrix2(s,X,num_agents,num_targets,transition_fxn,action_space,dyn,target_transition_fxn);
+           T = T(action,:);
            
 %            % extract seperate agent and target states from full state
 %            s_expanded = X(:,s);
@@ -69,7 +70,7 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
             
            for j=1:num_agents
                for k=1:num_targets
-                   if X(j,s) == X(num_agents + k,s)
+                   if X(num_targets+j,s) == X(k,s)
                        caught_flags(k) = 1;
                    end
                end
@@ -90,7 +91,8 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
 %            states = transition_fxn{actions}*states;
 
            % generate transitions for agents
-           greedy_T = BuildTransitionMatrix2(greedy_s,greedy_a,X,num_agents,num_targets,transition_fxn,action_space,dyn);
+           greedy_T = BuildTransitionMatrix2(greedy_s,X,num_agents,num_targets,transition_fxn,action_space,dyn,target_transition_fxn);
+           greedy_T = greedy_T(greedy_a,:);
            
 %            % extract seperate agent and target states from full state
 %            greedy_s_expanded = X(:,greedy_s);
@@ -113,7 +115,7 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
 %            % find the vectorized state index that matches expanded state
 %            greedy_s = find(sum(X==greedy_s_expanded)==num_targets+num_agents);
 
-            greedy_s = randsample(num_states^(num_agents+num_targets),1,true,greedy_T);
+           greedy_s = randsample(num_states^(num_agents+num_targets),1,true,greedy_T);
            
            % check to see if any target has been caught by agents
            for j=1:num_agents

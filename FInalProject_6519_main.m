@@ -10,12 +10,12 @@ AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 
 
-DynamicModel = 2;   % 1 - random walk, 2 - still target
+DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 2;   % number of agents
+nAgents = 1;   % number of agents
 nTargets = 1;
 dx = 1;
-L = 3;
+L = 5;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -173,7 +173,7 @@ end
 
 %% MDP solution
 
-[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k);
 
 % <<<<<<< HEAD
 
@@ -193,22 +193,39 @@ polSlice = Pol(ind);
 utilSlice = Val(ind);
 X2=flipud(X);
 
-% <<<<<<< HEAD
-plot_solution(utilSlice,polSlice,[L,L],target_loc);
-
-
-
-% <<<<<<< HEAD
-% =======
 %%
 if DynamicModel == 2
     plot_solution(utilSlice,polSlice,[L,L],target_loc);
 end
-% >>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
-%%
-%  [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
-    
 
+%% MDP Simulations
+
+% Run num_sims number of monte carlo simulations using the computed policy
+% and a greedy policy, and compute performance metrics.
+
+num_sims = 1000;
+
+[t, anm, acr, gt, ganm, gacr] = MDPsim(Val,Pol,P,Pkp1k,X,num_sims,nAgents,...
+                                        nTargets,N,DynamicModel,[L,L]);
+    
+% reassign output to descriptive variable names because matlab's return
+% syntax is weird / I don't know how to do it properly
+trajectories = t;
+avg_num_moves = anm;
+avg_cum_reward = acr;
+greedy_trajectories = gt;
+greedy_avg_num_moves = ganm;
+greedy_avg_cum_reward = gacr;
+
+% print summary of performance
+fprintf('\nMDP performance: %i Monte Carlo simulations: \n',num_sims)
+fprintf('================================================\n')
+fprintf('\t\t\t MDP \t\t Greedy\n')
+fprintf('------------------------------------------------\n')
+fprintf('Avg moves \t| \t %.2f \t\t %.2f\n',avg_num_moves,greedy_avg_num_moves)
+fprintf('Avg reward \t| \t %.2f \t %.2f\n',avg_cum_reward,greedy_avg_cum_reward)
+                                                            
+                                                            
 %% POMDP
 %% Build likelihood model to generate measurements 
 % PojX is the joint likelihood of detecting a target in cell jj, given the state

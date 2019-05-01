@@ -78,8 +78,8 @@ function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
             end
             
             if plot_flag
-                quiver(grid_coord(2),grid_coord(1),next_coord(2)-grid_coord(2),next_coord(1)-grid_coord(1),'Color',marker_color)
-                text(grid_coord(2)+0.5*(next_coord(2)-grid_coord(2)),grid_coord(1)+0.5*(next_coord(1)-grid_coord(1)),strcat('t=',num2str(i)))
+                quiver(grid_coord(2),grid_coord(1),(next_coord(2)-grid_coord(2)),(next_coord(1)-grid_coord(1)),'Color',marker_color)
+%                 text(grid_coord(2)+0.5*(next_coord(2)-grid_coord(2)),grid_coord(1)+0.5*(next_coord(1)-grid_coord(1)),strcat('t=',num2str(i)))
             end
 %             plot(grid_coord(1),grid_coord(2),markers(j),'Color',marker_color,'MarkerSize',10)
         end
