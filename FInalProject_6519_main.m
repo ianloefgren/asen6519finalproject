@@ -10,12 +10,12 @@ AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 
 
-DynamicModel = 2;   % 1 - random walk, 2 - still target
+DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 2;   % number of agents
+nAgents = 1;   % number of agents
 nTargets = 1;
 dx = 1;
-L = 3;
+L = 4;
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -33,19 +33,25 @@ N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
 
-Tloc=[3,6]; % 50]; % True initial location
+Tloc=[3]'; % 50]; % Target True initial location
+Aloc=[1]'; % 50]; % Agent True initial location
 
+xTrue = [Tloc ; Aloc];
 
 Pkp1k = zeros(N,N);
 
 % given that i'm in cell # jj the probability to go to cell #ii
-for jj=1:N  
-    nN = size(cTarget{jj,1},2); % # of neighbours
-    for ii=1:nN 
-        Pkp1k(cTarget{jj,1}(ii),jj) = 1/nN;
+if DynamicModel == 1   % Random walk
+    for jj=1:N  
+        nN = size(cTarget{jj,1},2); % # of neighbours
+        for ii=1:nN 
+            Pkp1k(cTarget{jj,1}(ii),jj) = 1/nN;
+        end
     end
-end
+elseif DynamicModel == 2 % Still Target
+        Pkp1k =eye(N);
 
+end % Dynamic Model
 %% Likelihood model for each grid point
 % pyxCell - each column corresponds to cell number
 % position is defined by the cell center
@@ -84,51 +90,48 @@ end
 % location.
 % Each column is a time step
 
-dt = 1; % [sec]
-tspan = 0:dt:100;
-
-% Targets dynamics
-
-for jj=1:nTargets
-    xTarget{jj} = zeros(N,length(tspan));
-    xTarget{jj}(Tloc(1,jj),1)=1;
-    if DynamicModel == 1 % Random walk
-
-    for kk=1:length(tspan)-1
-        Tloc(kk+1,jj)=randsample(seed,N,1,true,Pkp1k(:,Tloc(kk,jj)));
-        xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
-    end
-
-    elseif DynamicModel == 2 % Still Target
-        Pkp1k =eye(N);
-
-    end % Dynamic Model
-
-    if DynamicModel == 2 % if target is still
-        Tloc = Tloc.*ones(length(tspan),nTargets);
-        xTarget{jj} = xTarget{jj}*0;
-        xTarget{jj}(Tloc(1,jj),:)=1;
-    end
-end
+% dt = 1; % [sec]
+% tspan = 0:dt:100;
+% 
+% % Targets dynamics
+% 
+% for jj=1:nTargets
+%     xTarget{jj} = zeros(N,length(tspan));
+%     xTarget{jj}(Tloc(1,jj),1)=1;
+%     if DynamicModel == 1 % Random walk
+% 
+%     for kk=1:length(tspan)-1
+%         Tloc(kk+1,jj)=randsample(seed,N,1,true,Pkp1k(:,Tloc(kk,jj)));
+%         xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
+%     end
+% 
+%     
+% 
+%     elseif DynamicModel == 2 % if target is still
+%         Tloc = Tloc.*ones(length(tspan),nTargets);
+%         xTarget{jj} = xTarget{jj}*0;
+%         xTarget{jj}(Tloc(1,jj),:)=1;
+%     end
+% end
 
 
 % Sampling meausurments:
 % yMeas{ii,jj}(nn,kk) is the measurement taken by agent ii of target jj
 % when the agent is in cell number nn and the time step is kk
-for jj=1:nTargets
-    for kk=1:size(tspan,2)
-
-        GridCellTarget(kk,jj)= Tloc(kk,jj);% [z-N, z-1,z,z+1,z+N];
-
-        for ii=1:nAgents
-            for nn=1:N
-                pyx = pyxCell(GridCellTarget(kk,jj),nn); 
-                yMeas{ii,jj}(nn,kk) = randsample(seed,2,1,true,[1-pyx pyx])-1;
-            end
-        end
-
-    end
-end
+% for jj=1:nTargets
+%     for kk=1:size(tspan,2)
+% 
+%         GridCellTarget(kk,jj)= Tloc(kk,jj);% [z-N, z-1,z,z+1,z+N];
+% 
+%         for ii=1:nAgents
+%             for nn=1:N
+%                 pyx = pyxCell(GridCellTarget(kk,jj),nn); 
+%                 yMeas{ii,jj}(nn,kk) = randsample(seed,2,1,true,[1-pyx pyx])-1;
+%             end
+%         end
+% 
+%     end
+% end
 
 if plotFlag    % plotting target trajectory
     k2print = 101;
@@ -173,7 +176,7 @@ end
 
 %% MDP solution
 
-[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k);
 
 % <<<<<<< HEAD
 
@@ -181,7 +184,7 @@ end
 target_loc = [15,3]';
 % =======
 %%
-target_loc = [5]';
+target_loc = [7]';
 
 if nTargets==1
     ind = find(X(1,:) == target_loc(1));
@@ -196,15 +199,6 @@ X2=flipud(X);
 % <<<<<<< HEAD
 plot_solution(utilSlice,polSlice,[L,L],target_loc);
 
-
-
-% <<<<<<< HEAD
-% =======
-%%
-if DynamicModel == 2
-    plot_solution(utilSlice,polSlice,[L,L],target_loc);
-end
-% >>>>>>> 600648c6b83482b81afa9ef372ffe4ccad21b85e
 %%
 %  [trajectories,avg_num_moves,avg_cum_reward] = MDPsim(Val,Pol,P,X,1000,nAgents,nTargets,N,DynamicModel);
     
@@ -233,5 +227,6 @@ for sA=1:size(S_A,2)
 end
 
 
-[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pyxCell,yMeas,AlgoFlag,S_A);
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed);
+
 
