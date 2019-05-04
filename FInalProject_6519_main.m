@@ -8,7 +8,7 @@ fs = 16;
 plotFlag = 0;
 AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
-
+runMDPsim = 0;
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
@@ -212,7 +212,7 @@ end
 
 % Run num_sims number of monte carlo simulations using the computed policy
 % and a greedy policy, and compute performance metrics.
-
+if runMDPsim
 num_sims = 1000;
 
 [t, anm, acr, gt, ganm, gacr] = MDPsim(Val,Pol,P,Pkp1k,X,num_sims,nAgents,...
@@ -235,7 +235,7 @@ fprintf('------------------------------------------------\n')
 fprintf('Avg moves \t| \t %.2f \t\t %.2f\n',avg_num_moves,greedy_avg_num_moves)
 fprintf('Avg reward \t| \t %.2f \t %.2f\n',avg_cum_reward,greedy_avg_cum_reward)
                                                             
-                                                            
+end                                                           
 %% POMDP
 %% Build likelihood model to generate measurements 
 % PojX is the joint likelihood of detecting a target in cell jj, given the state
