@@ -16,7 +16,11 @@
 %   none
 %
 
-function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
+function MDPsimViz(trajectory,X,num_agents,num_targets,world_size,record)
+
+    if nargin < 6
+        record = false;
+    end
 
     color_wheel = [0    0.4470    0.7410;
     0.8500    0.3250    0.0980;
@@ -51,6 +55,8 @@ function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
     rectangle('Position',[0.5,0.5,world_size(1),world_size(2)],'EdgeColor','k','LineWidth',2)
     
     % plot trajectories
+    h = cell(num_agents+num_targets,1);
+    quiver_hist = cell(num_agents+num_targets,size(trajectory,2));
     for i=1:size(world_locations,2)
         plot_flag = true;
         for j=1:size(world_locations,1)
@@ -72,22 +78,41 @@ function MDPsimViz(trajectory,X,num_agents,num_targets,world_size)
             
             
             if j>num_agents
-                if trajectory(1+j,i)
+                if trajectory(2+j-num_agents,i)
                     plot_flag = false;
                 end
             end
             
             if plot_flag
-                quiver(grid_coord(2),grid_coord(1),(next_coord(2)-grid_coord(2)),(next_coord(1)-grid_coord(1)),'Color',marker_color)
+                delete(h{j})
+                if i>1
+                    quiver_hist{j,i-1}.ShowArrowHead = 'off';
+                    quiver_hist{j,i-1}.LineStyle = '-.';
+                end
+                quiver_hist{j,i} = quiver(grid_coord(2),grid_coord(1),(next_coord(2)-grid_coord(2)),(next_coord(1)-grid_coord(1)),'Color',marker_color);
+                h{j} = plot(next_coord(2),next_coord(1),markers(j),'MarkerSize',10,'Color',color_wheel(j,:));
 %                 text(grid_coord(2)+0.5*(next_coord(2)-grid_coord(2)),grid_coord(1)+0.5*(next_coord(1)-grid_coord(1)),strcat('t=',num2str(i)))
             end
 %             plot(grid_coord(1),grid_coord(2),markers(j),'Color',marker_color,'MarkerSize',10)
         end
-        input('press enter to display next timestep')
+        if record
+            mov(:,i) = getframe;
+        else
+            input('press enter to display next timestep')
+        end
     end
     
 %     legend('target 1','target 2','agent 1','Location','NorthEastOutside')
     legend('agent 1','target 1','target 2','Location','NorthEastOutside')
+    
+    if record
+        mov = repelem(mov,1,30*ones(1,size(mov,2)));
+        mov_title = strcat(num2str(num_agents),'agents_',num2str(num_targets),'targets_',num2str(world_size(1)),'x',num2str(world_size(2)));
+        v = VideoWriter(mov_title,'Archival');
+        open(v);
+        writeVideo(v,mov);
+        close(v);
+    end
 end
 
 
