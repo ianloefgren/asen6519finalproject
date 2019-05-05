@@ -45,27 +45,7 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
            T= BuildTransitionMatrix2(s,X,num_agents,num_targets,transition_fxn,action_space,dyn,target_transition_fxn);
            T = T(action,:);
            
-%            % extract seperate agent and target states from full state
-%            s_expanded = X(:,s);
-%            
-%            % compute agent state using sampled full state and action
-%            s_agents = randsample(num_states^(num_agents+num_targets),1,true,T_agent); % agents transition
-%            s_agents_expanded = X(1:num_agents,s_agents);
-%            
-%            for j=num_agents+1:size(s_expanded,1)
-%                
-%                if j <= num_agents
-%                    s_expanded(j) = randsample(num_states,1,true,T); % agents transition
-%                else
-%                    s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,s_expanded(j))); % targets transition
-%                end
-%            end
-%            
-%            % add agent states to new expanded state
-%            s_expanded(1:num_agents) = s_agents_expanded;
-%            % find the vectorized state index that matches expanded state
-%            s = find(sum(X==s_expanded)==num_targets+num_agents);
-%            
+           % get new state
            s = randsample(num_states^(num_agents+num_targets),1,true,T);
             
            for j=1:num_agents
@@ -93,34 +73,15 @@ function [trajectories, avg_num_moves, avg_cum_reward, greedy_trajectories, gree
            % generate transitions for agents
            greedy_T = BuildTransitionMatrix2(greedy_s,X,num_agents,num_targets,transition_fxn,action_space,dyn,target_transition_fxn);
            greedy_T = greedy_T(greedy_a,:);
-           
-%            % extract seperate agent and target states from full state
-%            greedy_s_expanded = X(:,greedy_s);
-%            
-%            % compute agent state using sampled full state and action
-%            greedy_s_agents = randsample(num_states^(num_agents+num_targets),1,true,greedy_T_agent); % agents transition
-%            greedy_s_agents_expanded = X(1:num_agents,greedy_s_agents);
-%            
-%            for j=num_agents+1:size(greedy_s_expanded,1)
-%                
-%                if j <= num_agents
-%                    greedy_s_expanded(j) = randsample(num_states,1,true,greedy_T_agent); % agents transition
-%                else
-%                    greedy_s_expanded(j) = randsample(num_states,1,true,target_transition_fxn(:,greedy_s_expanded(j))); % targets transition
-%                end
-%            end
-%            
-%            % add agent states to new expanded state
-%            greedy_s_expanded(1:num_agents) = greedy_s_agents_expanded;
-%            % find the vectorized state index that matches expanded state
-%            greedy_s = find(sum(X==greedy_s_expanded)==num_targets+num_agents);
 
+           % get new state
            greedy_s = randsample(num_states^(num_agents+num_targets),1,true,greedy_T);
            
            % check to see if any target has been caught by agents
            for j=1:num_agents
                for k=1:num_targets
-                   if X(j,greedy_s) == X(num_agents+k,greedy_s)
+%                    if X(j,greedy_s) == X(num_agents+k,greedy_s)
+                   if X(num_targets+j,greedy_s) == X(k,greedy_s)
                        greedy_caught_flags(k) = 1;
                    end
                end
@@ -178,8 +139,8 @@ function [action] = greedy_action(s,X,num_agents,num_targets,world_size)
                     act = [-1,0];
                 end
           
-                if sum(grid_locations(num_agents+j,:) - (grid_locations(i,:)+act)) < min_distance
-                    min_distance = abs(sum(grid_locations(num_agents+j,:) - (grid_locations(i,:)+act)));
+                if sum(grid_locations(j,:) - (grid_locations(num_targets+i,:)+act)) < min_distance
+                    min_distance = abs(sum(grid_locations(j,:) - (grid_locations(num_targets+i,:)+act)));
                     action(i) = a;
                 end
             end
