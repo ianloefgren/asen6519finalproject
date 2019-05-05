@@ -13,12 +13,13 @@
 %   num_agents
 %   num_targets
 %   world_size -- 2x1 vector of grid size ([L,L] usually)
+%   Obs - observations taken in the simulation
 %   record -- flag to record trajectories to video, default is false
 
-function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,world_size,record)
+function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,world_size,Obs,record)
 
     % make record flag optional argument
-    if nargin < 8
+    if nargin < 9
         record = false;
     end
                          
@@ -79,21 +80,31 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
         % plot true positions
         for i=1:size(world_locations,1)
             if i > num_targets
-                marker = 'o';
+                marker = 'ro';
             else
-                marker = 'x';
+                marker = 'rx';
             end
 
             grid_coord = vec2grid(world_locations(i,t),world_size);
-            plot(grid_coord(2),grid_coord(1),marker,'MarkerSize',10)
+            plot(grid_coord(2),grid_coord(1),marker,'MarkerSize',16)
         end
-    
+        
+        titleStr='Observation: ';
+        if t<size(state_trajectory,2)
+            for j=1:num_targets
+               titleStr=[titleStr,'T_',num2str(j),'=',num2str(Obs(j,t))]; 
+            end
+            for i=1:num_agents
+               titleStr=[titleStr,' ; A_',num2str(i),'=',num2str(Obs(i+num_targets,t))]; 
+            end
+            title(titleStr)
+        end
         if record
             mov(:,t) = getframe(gcf);
         else
             input('press enter to display next timestep')
         end
-    
+        
     end
     
     
