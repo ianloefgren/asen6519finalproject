@@ -12,7 +12,7 @@ runMDPsim = 0;
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 1;   % number of agents
+nAgents = 2;   % number of agents
 nTargets = 1;
 dx = 1;
 L = 4;
@@ -34,7 +34,7 @@ N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
 
-Tloc=[3]'; % 50]; % Target True initial location
+Tloc=[8]'; % 50]; % Target True initial location
 Aloc=[1]'; % 50]; % Agent True initial location
 
 xTrue = [Tloc ; Aloc];
@@ -56,7 +56,7 @@ end % Dynamic Model
 %% Likelihood model for each grid point
 % pyxCell - each column corresponds to cell number
 % position is defined by the cell center
-a = 0.9;
+a = 0.6;
 for ii=1:N
     iN = floor((ii-1)/nj)+1;
     jN = ii-(iN-1)*ni;
@@ -75,64 +75,15 @@ if plotFlag
     b1=figure();
     b1.Position = [343 178 1142 813];
     % 
-    pyx1 = reshape( pyxCell(:,100) , size(X1));
+    pyx1 = reshape( pyxCell(:,N) , size(X1));
     % surf(X1,X2,pyx1,'EdgeColor','none'), 
     surf(X1,X2,pyx1,'EdgeColor','none'), 
-    surf(X1,X2,pyx1,'EdgeColor','none','facecolor','interp'), 
+    surf(fliplr(X1),flipud(X2),pyx1,'EdgeColor','none','facecolor','interp'), 
     view(2), xlabel('X_1','FontSize',14),ylabel('X_2','FontSize',14),
     colorbar
     title('Sensor Likelihood function, p(y|x) - interpulated')
 end
 
-    
-%% Simulate targets dynamics and produce measurements    
-% xTarget{jj} is a matrix representation of target jj position
-% Position is indicated by "1" in the cell number corresponding to target
-% location.
-% Each column is a time step
-
-% dt = 1; % [sec]
-% tspan = 0:dt:100;
-% 
-% % Targets dynamics
-% 
-% for jj=1:nTargets
-%     xTarget{jj} = zeros(N,length(tspan));
-%     xTarget{jj}(Tloc(1,jj),1)=1;
-%     if DynamicModel == 1 % Random walk
-% 
-%     for kk=1:length(tspan)-1
-%         Tloc(kk+1,jj)=randsample(seed,N,1,true,Pkp1k(:,Tloc(kk,jj)));
-%         xTarget{jj}( Tloc(kk+1,jj),kk+1) = 1;
-%     end
-% 
-%     
-% 
-%     elseif DynamicModel == 2 % if target is still
-%         Tloc = Tloc.*ones(length(tspan),nTargets);
-%         xTarget{jj} = xTarget{jj}*0;
-%         xTarget{jj}(Tloc(1,jj),:)=1;
-%     end
-% end
-
-
-% Sampling meausurments:
-% yMeas{ii,jj}(nn,kk) is the measurement taken by agent ii of target jj
-% when the agent is in cell number nn and the time step is kk
-% for jj=1:nTargets
-%     for kk=1:size(tspan,2)
-% 
-%         GridCellTarget(kk,jj)= Tloc(kk,jj);% [z-N, z-1,z,z+1,z+N];
-% 
-%         for ii=1:nAgents
-%             for nn=1:N
-%                 pyx = pyxCell(GridCellTarget(kk,jj),nn); 
-%                 yMeas{ii,jj}(nn,kk) = randsample(seed,2,1,true,[1-pyx pyx])-1;
-%             end
-%         end
-% 
-%     end
-% end
 
 if plotFlag    % plotting target trajectory
     k2print = 101;
@@ -248,7 +199,18 @@ for ii=1:nAgents-1
 end
 S_A=eval(['combvec(',str,')']);
 
-pmx = eye(size(pyxCell));  % agent likelihood of own state m
+% pmx = eye(size(pyxCell));  % agent likelihood of own state m
+pmx = zeros(N,N);
+c=cAgent;
+for ii=1:ni
+   for jj=1:nj
+       s = (jj-1)*ni+ii;     
+               pmx(s,s)=0.95;
+               pmx(s,c{s}(c{s}~=s)) = (1-pmx(s,s))/(length(c{s})-1);         
+
+   end
+end
+
 pOjX = ones(N,size(S_A,2));
 for sA=1:size(S_A,2)
     for jj=1:N
