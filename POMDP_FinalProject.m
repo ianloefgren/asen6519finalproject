@@ -61,6 +61,8 @@ T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(a),DynamicModel,Pkp1k);
 
 sTrue(1) = randsample(size(X,2),1,true,T);
  
+trajectories{i}(:,1) = [s;a;caught_flags'];
+belief{i}(:,1) = p0;
 
 
 
@@ -112,8 +114,8 @@ pxy_p = pxy_m.*pYX/(pxy_m'*pYX);
 [~,a] = max(sum(repmat(pxy_p,1,size(A,2)).*Q),[],2);
 
 num_moves(i) = num_moves(i) + 1;
-trajectories{i}(:,1) = [sTrue(1);a;caught_flags'];
-belief{i}(:,1) = pxy_p;
+trajectories{i}(:,2) = [sTrue(1);a;caught_flags'];
+belief{i}(:,2) = pxy_p;
 
 % record action state pair, reward, and move count
 % trajectories{i}(:,end+1) = [s;action;caught_flags'];
@@ -171,13 +173,13 @@ while ~all(caught_flags)
         end
         for ii=1:nAgents
             for jj=1:nTargets
-                if Y(jj,1)==0
+                if Y(jj,kk)==0
                     P_Like =1-pOjX(:,sA);
                 else
                     P_Like =pOjX(:,sA);
                 end
 
-                pYX(s,1) = pYX(s,1).*pmx(Y(ii+nTargets,1),S_A(ii,sA)).*P_Like;
+                pYX(s,1) = pYX(s,1).*pmx(Y(ii+nTargets,kk),S_A(ii,sA)).*P_Like;
 
             end
         end
@@ -193,13 +195,13 @@ while ~all(caught_flags)
     if kk>1000
        break 
     end
-    belief{i}(:,kk) = pxy_p;
-    trajectories{i}(:,kk) = [sTrue(kk);a;caught_flags'];
+    belief{i}(:,kk+1) = pxy_p;
+    trajectories{i}(:,kk+1) = [sTrue(kk);a;caught_flags'];
     kk=kk+1;
 
 end
 
- 
+ POMDPViz(trajectories{1},belief{1},X,A,nAgents,nTargets,[4,4],Y)
 
 
 
