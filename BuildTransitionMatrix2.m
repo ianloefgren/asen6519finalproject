@@ -19,7 +19,7 @@ pT = zeros(1,size(X,2));
 
 %% Targets transition matrix - pT
 
-if DynamicModel==1  % random walk
+
     stateSize=1;
     str = '';
     for ii= 1:nTargets
@@ -50,22 +50,25 @@ if DynamicModel==1  % random walk
     %     if DynamicModel==2  % still target
     %         stateInd = stateInd(find(X(1:nTargets,stateInd)==X(1:nTargets,s)));                  
     % 
-    %     end 
+    %     end
+    if DynamicModel==1  % random walk
         if sum(pT(1,stateInd))==0
             pT(1,stateInd)=1;
         end
         for nn=1:nTargets                
             pT(1,stateInd) = pT(1,stateInd)*Ptmp(nn,TmpStateVec(nn,jj));
         end
-    end
+        
+    elseif DynamicModel==2  % still target
+
+         pT(1,stateInd)=1;
+     end
     if sum(pT(1,:))==0
         1;
     end
     pT(1,:) = pT(1,:)/sum(pT(1,:));  % normalize
 
-elseif DynamicModel==2  % still target
 
-    pT = ones(1,size(X,2));
 
 
 end
