@@ -1,5 +1,5 @@
 function [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,pOjX,pmx,...
-    AlgoFlag,S_A,Pkp1k,xTrue,seed)
+    AlgoFlag,S_A,Pkp1k,xTrue,seed,L)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -201,7 +201,7 @@ while ~all(caught_flags)
 
 end
 
- POMDPViz(trajectories{1},belief{1},X,A,nAgents,nTargets,[4,4],Y)
+ POMDPViz(trajectories{1},belief{1},X,A,nAgents,nTargets,[L,L],Y)
 
 
 
