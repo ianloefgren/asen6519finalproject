@@ -20,24 +20,24 @@ pT = zeros(1,size(X,2));
 %% Targets transition matrix - pT
 
 
-    stateSize=1;
-    str = '';
-    for ii= 1:nTargets
-        Ptmp(ii,:) = Pkp1k(:,X(ii,s))';
-        indCell{ii} = find(Ptmp(ii,:)~=0);
-    %             if DynamicModel==2  % still target
-    %                 1;
-    %             end
-        stateSize = stateSize*size(indCell{ii},2);
-        str = [str,['indCell{',num2str(ii),'},']];
-    end
+stateSize=1;
+str = '';
+for ii= 1:nTargets
+    Ptmp(ii,:) = Pkp1k(:,X(ii,s))';
+    indCell{ii} = find(Ptmp(ii,:)~=0);
+%             if DynamicModel==2  % still target
+%                 1;
+%             end
+    stateSize = stateSize*size(indCell{ii},2);
+    str = [str,['indCell{',num2str(ii),'},']];
+end
 
-    TmpStateVec = eval(['combvec(',str(1:end-1),')']);
+TmpStateVec = eval(['combvec(',str(1:end-1),')']);
 
 
-    for jj=1:size(TmpStateVec,2)             
+for jj=1:size(TmpStateVec,2)             
 
- 
+
          % All possible state wehre the targets are in different cells but the
         % agents states are constant
         if nTargets>1
@@ -45,7 +45,7 @@ pT = zeros(1,size(X,2));
             else
         [row,stateInd] = find(X(1:nTargets,:)==TmpStateVec(:,jj));
         end
-        
+
         % Only states where target states are stationary
     %     if DynamicModel==2  % still target
     %         stateInd = stateInd(find(X(1:nTargets,stateInd)==X(1:nTargets,s)));                  
@@ -58,7 +58,7 @@ pT = zeros(1,size(X,2));
         for nn=1:nTargets                
             pT(1,stateInd) = pT(1,stateInd)*Ptmp(nn,TmpStateVec(nn,jj));
         end
-        
+
     elseif DynamicModel==2  % still target
 
          pT(1,stateInd)=1;
@@ -66,13 +66,8 @@ pT = zeros(1,size(X,2));
     if sum(pT(1,:))==0
         1;
     end
-    pT(1,:) = pT(1,:)/sum(pT(1,:));  % normalize
-
-
-
-
 end
-
+pT(1,:) = pT(1,:)/sum(pT(1,:));  % normalizev
 
 %% Agents transition matrix - pA
 for a=1:size(A,2)
