@@ -57,7 +57,7 @@ num_moves(i) = num_moves(i) + 1;
 % find the current state # in thestate space
 [row,s] = find(sum(X==xTrue)==(nAgents+nTargets));
 % Transition from s to s' given the action a that we chose 
-T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(a),DynamicModel,Pkp1k);        
+T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(:,a),DynamicModel,Pkp1k);        
 
 sTrue(1) = randsample(size(X,2),1,true,T);
  
@@ -71,7 +71,7 @@ for jj=1:nTargets
     Y(jj,1) = randsample(seed,2,1,true,[1-pOjX(X(jj,sTrue),stateIndAgent) pOjX(X(jj,sTrue),stateIndAgent)])-1;
 end
 for jj=nTargets+1:nTargets+nAgents
-    Y(jj,1) = randsample(seed,size(pmx,1),1,true,pmx(:,stateIndAgent) ,stateIndAgent);
+    Y(jj,1) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
 end
 
 
@@ -80,7 +80,7 @@ pxy_m = zeros(size(p0));
 
 % Prediction
 for s=1:size(X,2)
-    T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(a),DynamicModel,Pkp1k);   
+    T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(:,a),DynamicModel,Pkp1k);   
     pxy_m(:,1)=pxy_m(:,1)+T'*p0(s,1);
 end
 
@@ -124,13 +124,13 @@ belief{i}(:,2) = pxy_p;
 kk=2;
 while ~all(caught_flags)
 % Transition from s to s' given the action a that we chose 
-    T= BuildTransitionMatrix2(sTrue(kk-1),X,nAgents,nTargets,P,A(a),DynamicModel,Pkp1k);
+    T= BuildTransitionMatrix2(sTrue(kk-1),X,nAgents,nTargets,P,A(:,a),DynamicModel,Pkp1k);
 
     sTrue(kk) = randsample(size(X,2),1,true,T);
 
     for j=1:nAgents
        for k=1:nTargets
-           if X(k,sTrue(kk)) == X(nAgents + j,sTrue(kk))
+           if X(k,sTrue(kk)) == X(nTargets + j,sTrue(kk))
                caught_flags(k) = 1;
            end
        end
@@ -148,7 +148,7 @@ while ~all(caught_flags)
         Y(jj,kk) = randsample(seed,2,1,true,[1-pOjX(X(jj,sTrue(kk)),stateIndAgent) pOjX(X(jj,sTrue(kk)),stateIndAgent)])-1;
     end
     for jj=nTargets+1:nTargets+nAgents
-        Y(jj,kk) = randsample(seed,size(pmx,1),1,true,pmx(:,stateIndAgent) ,stateIndAgent);
+        Y(jj,kk) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
     end
 
     
@@ -157,7 +157,7 @@ while ~all(caught_flags)
 
     % Prediction
     for s=1:size(X,2)
-        T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(a),DynamicModel,Pkp1k);   
+        T= BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A(:,a),DynamicModel,Pkp1k);   
         pxy_m(:,kk)=pxy_m(:,kk)+T'*pxy_p(s,1);
     end
 
