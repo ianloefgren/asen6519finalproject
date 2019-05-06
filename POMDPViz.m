@@ -62,7 +62,7 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
         for idx = 1:num_agents
 %             indv_agent_marg_prob(idx,:) = zeros(world_size(1)*world_size(2),1);
             for i=1:size(indv_agent_marg_prob,2)
-                indv_agent_marg_prob(idx,i) = sum(b(X(2,:)==i));
+                indv_agent_marg_prob(idx,i) = sum(b(X(num_targets+idx,:)==i));
             end
         end
         agent_marg_prob = sum(indv_agent_marg_prob,1);
