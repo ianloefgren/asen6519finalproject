@@ -151,7 +151,8 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
         titleStr='Observation: ';
         if t<size(state_trajectory,2)
             for j=1:num_targets
-               titleStr=[titleStr,'T_',num2str(j),'=',num2str(Obs(j,t))]; 
+               
+                titleStr=[titleStr,'T_',num2str(j),'=',num2str(Obs(j,t))]; 
             end
             for i=1:num_agents
                titleStr=[titleStr,' ; A_',num2str(i),'=',num2str(Obs(i+num_targets,t))]; 
