@@ -65,7 +65,7 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
             grid_coord = vec2grid(i,world_size);
 
             % populate belief grid representation using grid coords and prob
-            belief_plot_mat(grid_coord(2),grid_coord(1)) = target_marg_prob(i);
+            belief_plot_mat(grid_coord(1),grid_coord(2)) = target_marg_prob(i);
         end
 
         % plot marginzalized belief as heatmap
@@ -92,7 +92,8 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
         titleStr='Observation: ';
         if t<size(state_trajectory,2)
             for j=1:num_targets
-               titleStr=[titleStr,'T_',num2str(j),'=',num2str(Obs(j,t))]; 
+               
+                titleStr=[titleStr,'T_',num2str(j),'=',num2str(Obs(j,t))]; 
             end
             for i=1:num_agents
                titleStr=[titleStr,' ; A_',num2str(i),'=',num2str(Obs(i+num_targets,t))]; 
