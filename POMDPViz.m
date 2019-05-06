@@ -31,7 +31,7 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
     % get grid cell locations for each robot from state
     for i=1:size(state_trajectory,2)
         world_locations(:,i) = X(:,state_trajectory(1,i));
-%         actions(:,i) = AX(:,s);
+        actions(:,i) = A(:,state_trajectory(2,i));
     end
     
     figure
@@ -56,23 +56,82 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
         for i=1:size(target_marg_prob,1)
             target_marg_prob(i) = sum(b(X(1,:)==i));
         end
+        
+        indv_agent_marg_prob = zeros(num_agents,world_size(1)*world_size(2));
+        % marginalize over agent states
+        for idx = 1:num_agents
+%             indv_agent_marg_prob(idx,:) = zeros(world_size(1)*world_size(2),1);
+            for i=1:size(indv_agent_marg_prob,2)
+                indv_agent_marg_prob(idx,i) = sum(b(X(2,:)==i));
+            end
+        end
+        agent_marg_prob = sum(indv_agent_marg_prob,1);
+        agent_marg_prob = agent_marg_prob ./ sum(agent_marg_prob);
 
         % convert vector belief into grid belief
-        belief_plot_mat = zeros(world_size(1));
+        target_belief_plot_mat = zeros(world_size(1));
         for i=1:length(target_marg_prob)
 
             % get grid coords from position in loop
             grid_coord = vec2grid(i,world_size);
 
             % populate belief grid representation using grid coords and prob
-            belief_plot_mat(grid_coord(2),grid_coord(1)) = target_marg_prob(i);
+            target_belief_plot_mat(grid_coord(1),grid_coord(2)) = target_marg_prob(i);
+        end
+        
+        % convert vector belief into grid belief
+        agent_belief_plot_mat = zeros(world_size(1));
+        for i=1:length(agent_marg_prob)
+
+            % get grid coords from position in loop
+            grid_coord = vec2grid(i,world_size);
+
+            % populate belief grid representation using grid coords and prob
+            agent_belief_plot_mat(grid_coord(1),grid_coord(2)) = agent_marg_prob(i);
         end
 
         % plot marginzalized belief as heatmap
     %     figure
+        subplot(1,2,1)
         hold on;
-        imagesc(belief_plot_mat)
+        imagesc(target_belief_plot_mat)
+%         s1 = pcolor(target_belief_plot_mat);
+%         s1.FaceColor = 'interp';
+%         s1.EdgeColor = 'none';
         colorbar;
+        
+%         xspace = 1:1:world_size(1);
+%         [X1,X2] = meshgrid(xspace);
+%         surf(fliplr(X1),flipud(X2),target_belief_plot_mat,'EdgeColor','none','facecolor','interp')
+%         colorbar;
+
+        % find corresponding true target and agent positions from state
+        % trajectory
+
+        % plot true positions
+        for i=1:size(world_locations,1)
+            if i > num_targets
+                marker = 'ro';
+            else
+                marker = 'rx';
+            end
+
+            grid_coord = vec2grid(world_locations(i,t),world_size);
+            plot(grid_coord(2),grid_coord(1),marker,'MarkerSize',16)
+        end
+        
+        subplot(1,2,2)
+        hold on;
+        imagesc(agent_belief_plot_mat)
+%         s2 = pcolor(agent_belief_plot_mat);
+%         s2.FaceColor = 'interp';
+%         s2.EdgeColor = 'none';
+        colorbar;
+        
+%         xspace = 1:1:world_size(1);
+%         [X1,X2] = meshgrid(xspace);
+%         surf(fliplr(X1),flipud(X2),agent_belief_plot_mat,'EdgeColor','none','facecolor','interp')
+%         colorbar;
 
         % find corresponding true target and agent positions from state
         % trajectory
@@ -105,8 +164,10 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
             input('press enter to display next timestep')
         end
         
+        
     end
     
+    disp(actions)
     
     if record
         mov = repelem(mov,1,30*ones(1,size(mov,2)));
