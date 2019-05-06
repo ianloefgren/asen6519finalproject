@@ -1,4 +1,4 @@
-function [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k)
+function [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k,L)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -70,6 +70,51 @@ for jj=1:size(X,2)
     interCount = zeros(nTargets,1);
 end
 
+%% Penalizing for trying to get out of the grid
+R=repmat(R,1,size(A,2));
+
+for ii=1:nAgents
+    % left bound
+    if nAgents>1
+        [row,stateInd] = find(sum(X(nTargets+ii,:)<=L)==nAgents);
+    else
+        [row,stateInd] = find(X(nTargets+ii,:)<=L);
+    end
+    R(stateInd,5)=R(stateInd,5)-200;
+    
+    % Right Bound
+    if nAgents>1
+        [row,stateInd] = find(sum(X(nTargets+ii,:)>(N-L))==nAgents);
+    else
+        [row,stateInd] = find(X(nTargets+ii,:)>(N-L));
+    end
+    R(stateInd,4)=R(stateInd,4)-200;
+    
+    % upper bound
+    for ll=1:L
+        if nAgents>1
+            [row,stateInd] = find(sum(X(nTargets+ii,:)==L*ll)==nAgents);
+        else
+            [row,stateInd] = find(X(nTargets+ii,:)==L*ll);
+        end
+        R(stateInd,2)=R(stateInd,2)-200;
+    end
+    
+    % lower bound
+    for ll=1:L
+        if nAgents>1
+            [row,stateInd] = find(sum(X(nTargets+ii,:)==1+L*(ll-1))==nAgents);
+        else
+            [row,stateInd] = find(X(nTargets+ii,:)==1+L*(ll-1));
+        end
+        R(stateInd,3)=R(stateInd,3)-200;
+    end
+end
+
+
+
+
+
 % S=sparse(T{a});
 %  [i,j,k]=find(S);
 
@@ -85,10 +130,13 @@ while deltaU(k)>epsU
         [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         for a=1:size(A,2)   % actions
             for sp1 = 1:size(X,2) % next state
-                  Utmp(1,a) = Utmp(1,a)+T(a,sp1).*U(sp1,k);
+%                   Utmp(1,a) = Utmp(1,a)+T(a,sp1).*U(sp1,k);
+                  Utmp(1,a) = Utmp(1,a)+R(s,a)+gamma*T(a,sp1).*U(sp1,k);
             end
         end
-        [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
+%         [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
+         [U(s,k+1),Pol(s,1)] = max(Utmp(1,:),[],2);
+
     end
    
     k=k+1; 
