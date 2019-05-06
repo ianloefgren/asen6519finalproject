@@ -71,7 +71,9 @@ for jj=1:nTargets
     Y(jj,1) = randsample(seed,2,1,true,[1-pOjX(X(jj,sTrue),stateIndAgent) pOjX(X(jj,sTrue),stateIndAgent)])-1;
 end
 for jj=nTargets+1:nTargets+nAgents
-    Y(jj,1) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
+%     Y(jj,1) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
+    Y(jj,1) = randsample(seed,size(pmx,1),1,true,pmx(:,X(jj,sTrue(1))) ,stateIndAgent);
+
 end
 
 
@@ -148,7 +150,8 @@ while ~all(caught_flags)
         Y(jj,kk) = randsample(seed,2,1,true,[1-pOjX(X(jj,sTrue(kk)),stateIndAgent) pOjX(X(jj,sTrue(kk)),stateIndAgent)])-1;
     end
     for jj=nTargets+1:nTargets+nAgents
-        Y(jj,kk) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
+%         Y(jj,kk) = randsample(seed,size(pmx,1),1,true,pmx(:,S_A(jj-nTargets,stateIndAgent)) ,stateIndAgent);
+        Y(jj,kk) = randsample(seed,size(pmx,1),1,true,pmx(:,X(jj,sTrue(kk))) ,stateIndAgent);
     end
 
     
