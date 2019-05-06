@@ -10,7 +10,8 @@ if AlgoFlag==1 %QMDP
             for sp1 = 1:size(X,2) % next state
                   Qtmp(1,a) = Qtmp(1,a)+T(a,sp1).*vMDP(sp1);
             end
-            Q(s,a) = R(s,1)+Qtmp(1,a);
+%             Q(s,a) = R(s,1)+Qtmp(1,a);
+            Q(s,a) = R(s,a)+Qtmp(1,a);
         end
 
     end
