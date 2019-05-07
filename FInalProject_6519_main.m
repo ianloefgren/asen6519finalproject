@@ -2,7 +2,7 @@
 
 % column - agent number
 
-clear all;% clc; close all;
+%clear all;% clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
@@ -16,7 +16,7 @@ nAgents = 1;   % number of agents
 nTargets = 1;
 
 dx = 1;
-L = 3;
+L = 7;
 
 xspace = dx/2:dx:L-dx/2;
 
@@ -129,12 +129,13 @@ end
 
 %% MDP solution
 
-[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k,L);
-
 save_str = strcat(num2str(nAgents),'agents_',num2str(nTargets),'targets_',num2str(L),'x',num2str(L),'_dyn',num2str(DynamicModel),'.mat');
-save(save_str,'Pol','Val','X','A','R','nAgents','nTargets','DynamicModel')
+if ~exist('Pol','var')
 
-% <<<<<<< HEAD
+    [Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k,L);
+
+    save(save_str,'Pol','Val','X','A','R','nAgents','nTargets','DynamicModel')
+end
 
 %%
 target_loc = [15,3]';
