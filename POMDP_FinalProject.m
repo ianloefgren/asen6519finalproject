@@ -33,7 +33,7 @@ num_moves(i) = 0;
 % Utility
 % U = min(R(:,1))*ones(size(R));
 
-[Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k);
+[Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k,S_A,pOjX,pmx);
 
 caught_flags = zeros(1,nTargets);
 p0 = zeros(size(X,2),1);  

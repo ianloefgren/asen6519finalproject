@@ -6,13 +6,13 @@ clear all;% clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
-AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
+AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 runMDPsim = 0;
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 2;   % number of agents
+nAgents = 1;   % number of agents
 nTargets = 1;
 dx = 1;
 L = 4;
@@ -128,7 +128,7 @@ end
 
 %% MDP solution
 
-[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k,L);
 
 % <<<<<<< HEAD
 
@@ -222,6 +222,6 @@ for sA=1:size(S_A,2)
 end
 
 
-[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed);
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed,L);
 
 
