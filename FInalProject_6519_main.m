@@ -10,14 +10,15 @@ AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 runMDPsim = 0;
 
-DynamicModel = 1;   % 1 - random walk, 2 - still target
+if ~exist('Pol','var')
+    DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 1;   % number of agents
-nTargets = 1;
+    nAgents = 1;   % number of agents
+    nTargets = 1;
 
-dx = 1;
-L = 7;
-
+    dx = 1;
+    L = 7;
+end
 xspace = dx/2:dx:L-dx/2;
 
 
