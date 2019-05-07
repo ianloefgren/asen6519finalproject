@@ -13,9 +13,9 @@ runMDPsim = 0;
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
 nAgents = 2;   % number of agents
-nTargets = 1;
+nTargets = 2;
 dx = 1;
-L = 4;
+L = 3;
 
 xspace = dx/2:dx:L-dx/2;
 
@@ -34,8 +34,8 @@ N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
 
-Tloc=[8]'; % 50]; % Target True initial location
-Aloc=[1]'; % 50]; % Agent True initial location
+Tloc=[3]'; % 50]; % Target True initial location
+Aloc=[46]'; % 50]; % Agent True initial location
 
 xTrue = [Tloc ; Aloc];
 
@@ -128,7 +128,10 @@ end
 
 %% MDP solution
 
-[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k);
+[Pol,Val,X,A,R] = MDP_FinalProject(P,nAgents,nTargets,N,DynamicModel,Pkp1k,L);
+
+save_str = strcat(num2str(nAgents),'agents_',num2str(nTargets),'targets_',num2str(L),'x',num2str(L),'_dyn',num2str(DynamicModel),'.mat');
+save(save_str,'Pol','Val','X','A','R','nAgents','nTargets','DynamicModel')
 
 % <<<<<<< HEAD
 
@@ -222,6 +225,6 @@ for sA=1:size(S_A,2)
 end
 
 
-[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed);
+[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed,L,save_str);
 
 

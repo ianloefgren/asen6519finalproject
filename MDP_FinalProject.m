@@ -121,9 +121,13 @@ end
 % Utility
 U = min(R(:,1))*ones(size(R));
 
+total_iter_time = 0;
+
 k=1;
 deltaU=1;
 while deltaU(k)>epsU
+    
+    tic;
     
     for s=1:size(X,2)  % current state
         Utmp = zeros(1,size(A,2));
@@ -141,6 +145,19 @@ while deltaU(k)>epsU
    
     k=k+1; 
     deltaU(k) = max(abs(1-U(:,k)./U(:,k-1)));
+    
+    iter_time = toc;
+    total_iter_time = total_iter_time + iter_time;
+    avg_iter_time = total_iter_time / k;
+    
+    clc;
+    fprintf('=============================================================\n');
+    fprintf('MDP Value Iteration: Solving value function...\n')
+    fprintf('-------------------------------------------------------------\n')
+    fprintf('Num iterations: %i \t Total run time: %0.2f (s)\n',k,total_iter_time)
+    fprintf('Last iteration time: %0.2f (s)\t Avg. iteration time: %0.2f (s)\n',iter_time,avg_iter_time)
+    fprintf('Last max deltaU: %0.4f \t covergence epsU: %0.4f\n',deltaU(k),epsU);
+    fprintf('=============================================================\n');
     
     if k>1000
         break

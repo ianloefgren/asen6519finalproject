@@ -1,5 +1,5 @@
 function [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,pOjX,pmx,...
-    AlgoFlag,S_A,Pkp1k,xTrue,seed,L)
+    AlgoFlag,S_A,Pkp1k,xTrue,seed,L,save_str)
 % Solves the problem using Value Iteration
 % State vector x:
 % x=[T1...Tnt,A1....Ana]', i.e. the position of nt Targets and then
@@ -33,7 +33,14 @@ num_moves(i) = 0;
 % Utility
 % U = min(R(:,1))*ones(size(R));
 
-[Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k);
+if ~exist('Q','var')
+    [Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k);
+    
+    % append Q fxn to policy and value fxn file
+    save(save_str,'Q','-append')
+end
+
+
 
 caught_flags = zeros(1,nTargets);
 p0 = zeros(size(X,2),1);  
