@@ -6,14 +6,15 @@ clear all;% clc; close all;
 lw = 2;
 fs = 16;
 plotFlag = 0;
-AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
+AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 runMDPsim = 0;
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 2;   % number of agents
-nTargets = 2;
+nAgents = 1;   % number of agents
+nTargets = 1;
+
 dx = 1;
 L = 3;
 

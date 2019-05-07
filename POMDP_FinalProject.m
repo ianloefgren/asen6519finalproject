@@ -34,13 +34,11 @@ num_moves(i) = 0;
 % U = min(R(:,1))*ones(size(R));
 
 if ~exist('Q','var')
-    [Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k);
+    [Q] = computeQmatrix(P,nAgents,nTargets,X,DynamicModel,vMDP,A,R,AlgoFlag,Pkp1k,S_A,pOjX,pmx);
     
     % append Q fxn to policy and value fxn file
     save(save_str,'Q','-append')
 end
-
-
 
 caught_flags = zeros(1,nTargets);
 p0 = zeros(size(X,2),1);  

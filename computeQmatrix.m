@@ -32,7 +32,7 @@ else % FIB
 
 
     % create enumeration of possible observations
-    Y = combvec(0:1,0:1,1:size(S_A,2),1:size(S_A,2));
+    Y = combvec(0:1,1:size(S_A,2));
 
     for s=1:size(X,2)
         % create tmp vector for Q values of each action
@@ -78,11 +78,11 @@ else % FIB
                 end
             end
             
+           
+            % add potential future utility  and current reward to Q fxn
+            Q(s,a) = R(s,a) + Qtmp(1,a);
             
         end
-        
-        % add potential future utility  and current reward to Q fxn
-        Q(s,a) = R(s,1) + Qtmp(1,a);
             
             
     end
