@@ -6,7 +6,7 @@
 lw = 2;
 fs = 16;
 plotFlag = 0;
-AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
+AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 runMDPsim = 0;
 
@@ -16,9 +16,10 @@ if ~exist('Pol','var')
     nAgents = 1;   % number of agents
     nTargets = 1;
 
-    dx = 1;
+    
     L = 7;
 end
+dx = 1;
 xspace = dx/2:dx:L-dx/2;
 
 
