@@ -6,19 +6,20 @@
 lw = 2;
 fs = 16;
 plotFlag = 0;
-AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
+AlgoFlag = 1;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
 runMDPsim = 1;
 runPOMDPsim = 1;
 
-DynamicModel = 1;   % 1 - random walk, 2 - still target
+if ~exist('Pol','var')
+    DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 2;   % number of agents
-nTargets = 1;
+    nAgents = 1;   % number of agents
+    nTargets = 1;
+end
 
+L = 7;
 dx = 1;
-L = 4;
-
 xspace = dx/2:dx:L-dx/2;
 
 
@@ -72,47 +73,6 @@ for ii=1:N
 
 end
 
-% visualization
-if plotFlag
-    b1=figure();
-    b1.Position = [343 178 1142 813];
-    % 
-    pyx1 = reshape( pyxCell(:,N) , size(X1));
-    % surf(X1,X2,pyx1,'EdgeColor','none'), 
-    surf(X1,X2,pyx1,'EdgeColor','none'), 
-    surf(fliplr(X1),flipud(X2),pyx1,'EdgeColor','none','facecolor','interp'), 
-    view(2), xlabel('X_1','FontSize',14),ylabel('X_2','FontSize',14),
-    colorbar
-    title('Sensor Likelihood function, p(y|x) - interpulated')
-end
-
-
-if plotFlag    % plotting target trajectory
-    k2print = 101;
-    N1 = length(xspace);
-    cellT = GridCellTarget(k2print-1,1);
-
-    x1True = X1(cellT);
-    x2True = X2(cellT);
-
-    for k=1:length(GridCellTarget)
-        cellT = GridCellTarget(k,1);
-        x1TrueVec(k) = X1(cellT);
-        x2TrueVec(k) = X2(cellT);
-    end
-
-
-
-    b2 = figure();
-    b2.Position = [343 178 1142 813];
-
-    plot(x1True,x2True,'rx',x1TrueVec(1),x2TrueVec(1),'ro',...
-        'markersize',16)
-    hold on
-    plot(x1TrueVec(1:k2print-1),x2TrueVec(1:k2print-1),'r--')
-    grid on
-end
-
 %% State Transition Matrix
 % P(s'|s,a) -->  P{a}(s,s')
 % a = 1 - stay
@@ -139,10 +99,10 @@ if ~exist('Pol','var')
 end
 
 %%
-target_loc = [15,3]';
+target_loc = [42]';
 % =======
 %%
-target_loc = [7]';
+target_loc = [42]';
 
 if nTargets==1
     ind = find(X(1,:) == target_loc(1));
