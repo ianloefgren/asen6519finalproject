@@ -35,6 +35,7 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
     end
     
     figure
+    set(gcf, 'Position', get(0, 'Screensize'));
     for t=1:size(state_trajectory,2)
         clf;
     
@@ -160,6 +161,8 @@ function POMDPViz(state_trajectory,belief_trajectory,X,A,num_agents,num_targets,
             title(titleStr)
         end
         if record
+            drawnow;
+            pause(0.5);
             mov(:,t) = getframe(gcf);
         else
             input('press enter to display next timestep')

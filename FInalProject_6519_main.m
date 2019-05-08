@@ -8,15 +8,16 @@ fs = 16;
 plotFlag = 0;
 AlgoFlag = 2;   % 1 - QMDP, 2 - FIB
 seed = RandStream('mlfg6331_64');
-runMDPsim = 0;
+runMDPsim = 1;
+runPOMDPsim = 1;
 
 DynamicModel = 1;   % 1 - random walk, 2 - still target
 
-nAgents = 1;   % number of agents
+nAgents = 2;   % number of agents
 nTargets = 1;
 
 dx = 1;
-L = 7;
+L = 4;
 
 xspace = dx/2:dx:L-dx/2;
 
@@ -35,8 +36,8 @@ N = length(x);
 cTarget = whoRmyNeighbours(ni,nj,1);
 
 
-Tloc=[3]'; % 50]; % Target True initial location
-Aloc=[46]'; % 50]; % Agent True initial location
+Tloc=[1]'; % 50]; % Target True initial location
+Aloc=[16]'; % 50]; % Agent True initial location
 
 xTrue = [Tloc ; Aloc];
 
@@ -227,6 +228,49 @@ for sA=1:size(S_A,2)
 end
 
 
-[Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed,L,save_str);
+% [Q] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed,L,save_str);
 
+%% POMDP Simulations
 
+% Run num_sims number of monte carlo simulations using the computed policy
+% and a greedy policy, and compute performance metrics.
+if runPOMDPsim
+num_sims = 1000;
+
+avg_num_moves = 0;
+pomdp_trajectories = cell(1,num_sims);
+beliefs = cell(1,num_sims);
+
+for i=1:num_sims
+
+    if ~exist('Q','var')
+        Q = false;
+    end
+    [~,trajectory,belief,num_moves,~] = POMDP_FinalProject(P,nAgents,nTargets,X,DynamicModel,Val,A,R,pOjX,pmx,AlgoFlag,S_A,Pkp1k,xTrue,seed,L,save_str,Q);
+
+    pomdp_trajectories{i} = trajectory{1};
+    beliefs{i} = belief{1};
+    avg_num_moves = avg_num_moves + num_moves;
+
+end
+    
+avg_num_moves = avg_num_moves / num_sims;
+
+% reassign output to descriptive variable names because matlab's return
+% syntax is weird / I don't know how to do it properly
+% trajectories = t;
+% avg_num_moves = anm;
+% avg_cum_reward = acr;
+% greedy_trajectories = gt;
+greedy_avg_num_moves = 0;
+% greedy_avg_cum_reward = gacr;
+
+% print summary of performance
+fprintf('\nPOMDP performance: %i Monte Carlo simulations: \n',num_sims)
+fprintf('================================================\n')
+fprintf('\t\t\t POMDP \t\t Greedy\n')
+fprintf('------------------------------------------------\n')
+fprintf('Avg moves \t| \t %.2f \t\t %.2f\n',avg_num_moves,greedy_avg_num_moves)
+% fprintf('Avg reward \t| \t %.2f \t %.2f\n',avg_cum_reward,greedy_avg_cum_reward)
+
+end
