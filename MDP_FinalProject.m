@@ -111,13 +111,6 @@ for ii=1:nAgents
     end
 end
 
-
-
-
-
-% S=sparse(T{a});
-%  [i,j,k]=find(S);
-
 % Utility
 U = min(R(:,1))*ones(size(R));
 
@@ -134,11 +127,9 @@ while deltaU(k)>epsU
         [T] = BuildTransitionMatrix2(s,X,nAgents,nTargets,P,A,DynamicModel,Pkp1k);
         for a=1:size(A,2)   % actions
             for sp1 = 1:size(X,2) % next state
-%                   Utmp(1,a) = Utmp(1,a)+T(a,sp1).*U(sp1,k);
                   Utmp(1,a) = Utmp(1,a)+R(s,a)+gamma*T(a,sp1).*U(sp1,k);
             end
         end
-%         [U(s,k+1),Pol(s,1)] = max(R(s,1)+gamma*Utmp(1,:),[],2);
          [U(s,k+1),Pol(s,1)] = max(Utmp(1,:),[],2);
 
     end
